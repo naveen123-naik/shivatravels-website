@@ -7,6 +7,14 @@ export async function POST(request: Request) {
     let expectedUsername = (process.env.ADMIN_USERNAME || 'shiva123').trim();
     let expectedPassword = (process.env.ADMIN_PASSWORD || 'shiva@123').trim();
 
+    console.log('[Auth Debug] Received:', { username, passwordLength: password?.length });
+    console.log('[Auth Debug] Env status:', {
+      ADMIN_USERNAME_defined: process.env.ADMIN_USERNAME !== undefined,
+      ADMIN_PASSWORD_defined: process.env.ADMIN_PASSWORD !== undefined,
+      ADMIN_USERNAME_raw: process.env.ADMIN_USERNAME,
+      ADMIN_PASSWORD_raw: process.env.ADMIN_PASSWORD,
+    });
+
     // Strip surrounding double quotes if present (common copy-paste issue)
     if (expectedUsername.startsWith('"') && expectedUsername.endsWith('"')) {
       expectedUsername = expectedUsername.slice(1, -1);
