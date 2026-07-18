@@ -3,20 +3,16 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useMockDB } from '@/context/MockDBContext';
-import { Vehicle, Review, Driver, GalleryItem } from '@/data/defaultMockData';
+import { Vehicle, Review, GalleryItem } from '@/data/defaultMockData';
 import {
-  PieChart, Pie, Cell, Legend, ResponsiveContainer
-} from 'recharts';
-import {
-  LogOut, Users, Car, Plus, Edit, Trash2, Check, X,
-  LayoutDashboard, Star, Image as ImageIcon, Mail
+  LogOut, Car, Plus, Edit, Trash2, Check, X,
+  Star, Image as ImageIcon, Mail, RefreshCw, ShieldCheck, ArrowLeft
 } from 'lucide-react';
 
 export default function AdminPage() {
   const {
-    vehicles, reviews, gallery, drivers, isLoaded,
+    vehicles, reviews, gallery, isLoaded,
     addVehicle, updateVehicle, deleteVehicle,
-    addDriver, updateDriver, deleteDriver,
     addGalleryItem, deleteGalleryItem,
     messages, updateMessageStatus, deleteMessage
   } = useMockDB();
@@ -29,7 +25,7 @@ export default function AdminPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Dashboard state
-  const [activeTab, setActiveTab] = useState<'overview' | 'fleet' | 'drivers' | 'reviews' | 'gallery' | 'messages'>('overview');
+  const [activeTab, setActiveTab] = useState<'fleet' | 'reviews' | 'gallery' | 'messages'>('fleet');
 
   // Form states for Gallery
   const [isGalleryModalOpen, setIsGalleryModalOpen] = useState(false);
@@ -50,16 +46,6 @@ export default function AdminPage() {
   const [vehiclePrice, setVehiclePrice] = useState(13);
   const [vehicleAllowance, setVehicleAllowance] = useState(350);
   const [vehicleFeatures, setVehicleFeatures] = useState('');
-
-  // Form states for Drivers
-  const [isDriverModalOpen, setIsDriverModalOpen] = useState(false);
-  const [editingDriver, setEditingDriver] = useState<Driver | null>(null);
-  const [driverName, setDriverName] = useState('');
-  const [driverMobile, setDriverMobile] = useState('');
-  const [driverLicense, setDriverLicense] = useState('');
-  const [driverExperience, setDriverExperience] = useState(5);
-  const [driverStatus, setDriverStatus] = useState<Driver['status']>('Available');
-  const [driverAssignedVehicle, setDriverAssignedVehicle] = useState('');
 
   // Check past session login
   useEffect(() => {
@@ -102,29 +88,7 @@ export default function AdminPage() {
     sessionStorage.removeItem('snt_admin_auth');
   };
 
-  // -------------------------------------------------------------
-  // ANALYTICS CALCULATIONS
-  // -------------------------------------------------------------
-  // Average Rating
-  const averageRating = (reviews.reduce((sum, r) => sum + r.rating, 0) / (reviews.length || 1)).toFixed(1);
 
-  // Vehicle allocation status (Recharts pie chart)
-  const getFleetAllocationData = () => {
-    let available = 0;
-    let booked = 0;
-
-    vehicles.forEach((v) => {
-      if (v.available) available++;
-      else booked++;
-    });
-
-    return [
-      { name: 'Available', value: available },
-      { name: 'Booked / Maintenance', value: booked },
-    ];
-  };
-
-  const COLORS = ['#0f4c81', '#ef4444'];
 
   // -------------------------------------------------------------
   // VEHICLE CRUD HANDLERS
@@ -198,55 +162,7 @@ export default function AdminPage() {
 
 
 
-  // -------------------------------------------------------------
-  // DRIVER CRUD HANDLERS
-  // -------------------------------------------------------------
-  const openAddDriverModal = () => {
-    setEditingDriver(null);
-    setDriverName('');
-    setDriverMobile('');
-    setDriverLicense('');
-    setDriverExperience(5);
-    setDriverStatus('Available');
-    setDriverAssignedVehicle('');
-    setIsDriverModalOpen(true);
-  };
 
-  const openEditDriverModal = (d: Driver) => {
-    setEditingDriver(d);
-    setDriverName(d.name);
-    setDriverMobile(d.mobile);
-    setDriverLicense(d.license);
-    setDriverExperience(d.experience);
-    setDriverStatus(d.status);
-    setDriverAssignedVehicle(d.assignedVehicle || '');
-    setIsDriverModalOpen(true);
-  };
-
-  const handleSaveDriver = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (editingDriver) {
-      updateDriver({
-        ...editingDriver,
-        name: driverName,
-        mobile: driverMobile,
-        license: driverLicense,
-        experience: Number(driverExperience),
-        status: driverStatus,
-        assignedVehicle: driverAssignedVehicle || undefined,
-      });
-    } else {
-      addDriver({
-        name: driverName,
-        mobile: driverMobile,
-        license: driverLicense,
-        experience: Number(driverExperience),
-        status: driverStatus,
-        assignedVehicle: driverAssignedVehicle || undefined,
-      });
-    }
-    setIsDriverModalOpen(false);
-  };
 
 
 
@@ -439,27 +355,15 @@ export default function AdminPage() {
           </span>
 
           <button
-            onClick={() => setActiveTab('overview')}
+            onClick={() => setActiveTab('fleet')}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-left transition-all ${
-              activeTab === 'overview'
+              activeTab === 'fleet'
                 ? 'bg-gold-500 text-navy-850 shadow-md font-extrabold'
                 : 'hover:bg-slate-900 text-slate-400 hover:text-white'
             }`}
           >
-            <LayoutDashboard size={16} />
-            <span>Overview Analytics</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('drivers')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-left transition-all ${
-              activeTab === 'drivers'
-                ? 'bg-gold-500 text-navy-850 shadow-md font-extrabold'
-                : 'hover:bg-slate-900 text-slate-400 hover:text-white'
-            }`}
-          >
-            <Users size={16} />
-            <span>Drivers Manager ({drivers ? drivers.length : 0})</span>
+            <Car size={16} />
+            <span>Fleet Inventory ({vehicles.length})</span>
           </button>
 
           <button
@@ -472,18 +376,6 @@ export default function AdminPage() {
           >
             <Star size={16} />
             <span>Reviews ({reviews.length})</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('fleet')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-left transition-all ${
-              activeTab === 'fleet'
-                ? 'bg-gold-500 text-navy-850 shadow-md font-extrabold'
-                : 'hover:bg-slate-900 text-slate-400 hover:text-white'
-            }`}
-          >
-            <Car size={16} />
-            <span>Fleet Inventory ({vehicles.length})</span>
           </button>
 
           <button
@@ -514,88 +406,7 @@ export default function AdminPage() {
         {/* Right Side Work Area */}
         <main className="flex-grow p-6 sm:p-8 relative">
           
-          {/* TAB 1: OVERVIEW ANALYTICS */}
-          {activeTab === 'overview' && (
-            <div className="space-y-8 animate-[fadeIn_0.3s_ease-out]">
-              {/* Stat Row */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex items-center gap-5">
-                  <div className="w-12 h-12 rounded-2xl bg-green-500/10 border border-green-500/20 flex items-center justify-center shrink-0">
-                    <Car className="text-green-400" size={24} />
-                  </div>
-                  <div>
-                    <span className="block text-[10px] uppercase font-bold text-slate-400 tracking-wider">Active Fleet Size</span>
-                    <span className="text-2xl font-black text-white">{vehicles.length} Vehicles</span>
-                  </div>
-                </div>
 
-                <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex items-center gap-5">
-                  <div className="w-12 h-12 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center shrink-0">
-                    <Users className="text-blue-400" size={24} />
-                  </div>
-                  <div>
-                    <span className="block text-[10px] uppercase font-bold text-slate-400 tracking-wider">Total Drivers</span>
-                    <span className="text-2xl font-black text-white">{drivers.length} Drivers</span>
-                  </div>
-                </div>
-
-                <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex items-center gap-5">
-                  <div className="w-12 h-12 rounded-2xl bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center shrink-0">
-                    <Star className="text-yellow-400" size={24} />
-                  </div>
-                  <div>
-                    <span className="block text-[10px] uppercase font-bold text-slate-400 tracking-wider">Average Rating</span>
-                    <span className="text-2xl font-black text-white">
-                      {averageRating} / 5.0
-                    </span>
-                  </div>
-                </div>
-
-                <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex items-center gap-5">
-                  <div className="w-12 h-12 rounded-2xl bg-gold-500/10 border border-gold-500/20 flex items-center justify-center shrink-0">
-                    <Mail className="text-gold-500" size={24} />
-                  </div>
-                  <div>
-                    <span className="block text-[10px] uppercase font-bold text-slate-400 tracking-wider">Inquiries Received</span>
-                    <span className="text-2xl font-black text-white">{messages.length} Messages</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Chart Grids */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                {/* Fleet availability ratio */}
-                <div className="lg:col-span-6 bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col justify-between">
-                  <div>
-                    <h3 className="font-extrabold text-base mb-6 tracking-wide text-slate-200 flex items-center gap-2">
-                      <Car size={16} className="text-gold-500" />
-                      Fleet Allocation Status
-                    </h3>
-                    <div className="h-60 w-full text-xs flex justify-center items-center">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <PieChart>
-                          <Pie
-                            data={getFleetAllocationData()}
-                            cx="50%"
-                            cy="50%"
-                            innerRadius={60}
-                            outerRadius={80}
-                            fill="#8884d8"
-                            paddingAngle={5}
-                            dataKey="value"
-                          >
-                            <Cell fill="#0f4c81" />
-                            <Cell fill="#ef4444" />
-                          </Pie>
-                          <Legend wrapperStyle={{ color: '#ffffff' }} />
-                        </PieChart>
-                      </ResponsiveContainer>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
 
 
 
@@ -718,91 +529,7 @@ export default function AdminPage() {
             </div>
           )}
 
-          {/* TAB: DRIVERS MANAGER */}
-          {activeTab === 'drivers' && (
-            <div className="space-y-6 animate-[fadeIn_0.3s_ease-out]">
-              <div className="flex items-center justify-between border-b border-slate-900 pb-3">
-                <h3 className="text-xl font-extrabold text-white tracking-wide">
-                  Drivers Operations Console
-                </h3>
-                <button
-                  onClick={openAddDriverModal}
-                  className="bg-gold-500 hover:bg-gold-600 text-navy-850 font-bold px-4 py-2.5 rounded-xl text-xs flex items-center gap-1.5 cursor-pointer shadow-md transition-all duration-200"
-                >
-                  <Plus size={14} /> Add New Driver
-                </button>
-              </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {drivers && drivers.map((d) => (
-                  <div
-                    key={d.id}
-                    className="bg-slate-900 border border-slate-800 rounded-3xl p-5 flex flex-col justify-between relative group"
-                  >
-                    <div>
-                      {/* Name & Status */}
-                      <div className="flex justify-between items-start gap-2">
-                        <h4 className="font-extrabold text-base text-white">{d.name}</h4>
-                        <span
-                          className={`font-black text-[9px] uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${
-                            d.status === 'Available'
-                              ? 'bg-green-500/10 border-green-500/30 text-green-400'
-                              : d.status === 'On Duty'
-                              ? 'bg-blue-500/10 border-blue-500/30 text-blue-400'
-                              : 'bg-red-500/10 border-red-500/30 text-red-400'
-                          }`}
-                        >
-                          {d.status}
-                        </span>
-                      </div>
-
-                      {/* Driver Details */}
-                      <div className="space-y-2 mt-4 text-xs font-semibold text-slate-400">
-                        <p className="flex justify-between">
-                          <span>Mobile Number:</span>
-                          <span className="text-white">{d.mobile}</span>
-                        </p>
-                        <p className="flex justify-between">
-                          <span>DL License:</span>
-                          <span className="text-white uppercase">{d.license}</span>
-                        </p>
-                        <p className="flex justify-between">
-                          <span>Experience:</span>
-                          <span className="text-white">{d.experience} Years</span>
-                        </p>
-                        <p className="flex justify-between">
-                          <span>Assigned Fleet:</span>
-                          <span className="text-gold-500 font-extrabold">{d.assignedVehicle || 'None'}</span>
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Action Controls */}
-                    <div className="flex gap-2 mt-6 pt-3 border-t border-slate-800/80">
-                      <button
-                        onClick={() => openEditDriverModal(d)}
-                        className="flex-grow py-2 px-3 bg-slate-800 hover:bg-slate-700 text-slate-350 hover:text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
-                      >
-                        <Edit size={12} />
-                        Edit details
-                      </button>
-                      <button
-                        onClick={() => {
-                          if (confirm(`Are you sure you want to remove driver ${d.name}?`)) {
-                            deleteDriver(d.id);
-                          }
-                        }}
-                        className="py-2 px-3 border border-slate-800 hover:border-red-500/20 bg-slate-950 hover:bg-red-500/10 text-slate-455 hover:text-red-400 font-bold rounded-xl transition-all cursor-pointer"
-                        title="Remove driver"
-                      >
-                        <Trash2 size={12} />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
 
           {/* TAB: GALLERY MANAGER */}
           {activeTab === 'gallery' && (
@@ -1122,117 +849,7 @@ export default function AdminPage() {
 
 
 
-      {/* -------------------------------------------------------------
-          DRIVER MODAL DIALOG
-      ------------------------------------------------------------- */}
-      {isDriverModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setIsDriverModalOpen(false)} />
-          
-          <div className="bg-slate-900 border border-slate-800 text-white rounded-3xl p-6 w-full max-w-md relative z-10 shadow-2xl">
-            <h3 className="text-lg font-bold text-white mb-6 border-b border-slate-800 pb-3 flex items-center gap-2">
-              <Users size={18} className="text-gold-500" />
-              {editingDriver ? 'Edit Driver Details' : 'Register New Driver'}
-            </h3>
 
-            <form onSubmit={handleSaveDriver} className="space-y-4 text-xs font-semibold">
-              <div>
-                <label className="block text-[10px] text-slate-400 mb-1.5 uppercase font-bold">Driver Full Name</label>
-                <input
-                  type="text"
-                  required
-                  value={driverName}
-                  onChange={(e) => setDriverName(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-800 bg-navy-950 text-xs font-bold text-white focus:outline-none"
-                  placeholder="e.g. Rama Rao"
-                />
-              </div>
-
-              <div>
-                <label className="block text-[10px] text-slate-400 mb-1.5 uppercase font-bold">Mobile Phone Number</label>
-                <input
-                  type="text"
-                  required
-                  value={driverMobile}
-                  onChange={(e) => setDriverMobile(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-800 bg-navy-950 text-xs font-bold text-white focus:outline-none"
-                  placeholder="e.g. 8074324003"
-                />
-              </div>
-
-              <div>
-                <label className="block text-[10px] text-slate-400 mb-1.5 uppercase font-bold">Driving License Number</label>
-                <input
-                  type="text"
-                  required
-                  value={driverLicense}
-                  onChange={(e) => setDriverLicense(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-800 bg-navy-950 text-xs font-bold text-white focus:outline-none"
-                  placeholder="e.g. AP09DL12345"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-[10px] text-slate-400 mb-1.5 uppercase font-bold">Experience (Years)</label>
-                  <input
-                    type="number"
-                    required
-                    value={driverExperience}
-                    onChange={(e) => setDriverExperience(parseInt(e.target.value) || 0)}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-800 bg-navy-950 text-xs font-bold text-white focus:outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[10px] text-slate-400 mb-1.5 uppercase font-bold">Current Status</label>
-                  <select
-                    value={driverStatus}
-                    onChange={(e) => setDriverStatus(e.target.value as any)}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-800 bg-navy-950 text-xs font-bold text-white focus:outline-none"
-                  >
-                    <option value="Available">Available</option>
-                    <option value="On Duty">On Duty</option>
-                    <option value="Leave">Leave</option>
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-[10px] text-slate-400 mb-1.5 uppercase font-bold">Assigned Vehicle</label>
-                <select
-                  value={driverAssignedVehicle}
-                  onChange={(e) => setDriverAssignedVehicle(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-800 bg-navy-950 text-xs font-bold text-white focus:outline-none"
-                >
-                  <option value="">No Vehicle Assigned</option>
-                  {vehicles.map((v) => (
-                    <option key={v.id} value={v.name}>
-                      {v.name} ({v.category})
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="flex gap-3 mt-6 pt-4 border-t border-slate-800">
-                <button
-                  type="button"
-                  onClick={() => setIsDriverModalOpen(false)}
-                  className="flex-1 py-3 border border-slate-800 text-slate-400 hover:bg-slate-800 rounded-xl transition-colors font-bold"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="flex-1 py-3 bg-gold-500 hover:bg-gold-600 text-navy-850 rounded-xl transition-colors font-extrabold shadow-md hover:shadow-lg"
-                >
-                  Save Driver Details
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
 
       {/* -------------------------------------------------------------
           GALLERY MODAL DIALOG
