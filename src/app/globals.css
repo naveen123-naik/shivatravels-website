@@ -1,26 +1,146 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: var(--font-outfit), system-ui, -apple-system, sans-serif;
+  
+  --color-gold-50: #fdfbeb;
+  --color-gold-100: #fbf7c7;
+  --color-gold-200: #f7ed8f;
+  --color-gold-300: #f2db54;
+  --color-gold-400: #ebc429;
+  --color-gold-500: #d4af37; /* Metallic Gold */
+  --color-gold-600: #b58d24;
+  --color-gold-700: #8c671a;
+  --color-gold-800: #6b4d16;
+  --color-gold-900: #573e15;
+
+  --color-navy-50: #f0f4f8;
+  --color-navy-100: #dce4ee;
+  --color-navy-200: #bdcedf;
+  --color-navy-300: #90adcc;
+  --color-navy-400: #5d88b4;
+  --color-navy-500: #0f4c81; /* Premium Classic Blue */
+  --color-navy-600: #0a3d6b;
+  --color-navy-700: #072f54;
+  --color-navy-800: #05223e;
+  --color-navy-900: #041b30;
+  --color-navy-950: #031427; /* Dark Deep Navy */
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* Glassmorphism styling */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+.dark .glass-panel {
+  background: rgba(3, 20, 39, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.glass-nav {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dark .glass-nav {
+  background: rgba(3, 20, 39, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Premium Gold Text Gradients */
+.text-gold-gradient {
+  background: linear-gradient(135deg, #f59e0b 0%, #d4af37 50%, #b58d24 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.bg-gold-gradient {
+  background: linear-gradient(135deg, #ebc429 0%, #d4af37 50%, #b58d24 100%);
+}
+
+.bg-navy-gradient {
+  background: linear-gradient(135deg, #0f4c81 0%, #0a3d6b 50%, #031427 100%);
+}
+
+/* Glow Effects */
+.gold-glow {
+  box-shadow: 0 4px 20px -2px rgba(212, 175, 55, 0.35);
+}
+
+.blue-glow {
+  box-shadow: 0 4px 20px -2px rgba(15, 76, 129, 0.3);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: #031427;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #0f4c81;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #d4af37;
+}
+
+/* Masonry grid support */
+.masonry-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-gap: 1.5rem;
+}
+
+/* Printing styles for Receipt */
+@media print {
+  body * {
+    visibility: hidden;
   }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  #print-receipt-modal, #print-receipt-modal * {
+    visibility: visible;
+  }
+  #print-receipt-modal {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    background: white !important;
+    color: black !important;
+  }
+  .no-print {
+    display: none !important;
+  }
 }
