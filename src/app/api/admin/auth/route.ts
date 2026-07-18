@@ -4,12 +4,20 @@ export async function POST(request: Request) {
   try {
     const { username, password } = await request.json();
 
-    const expectedUsername = process.env.ADMIN_USERNAME || 'shiva123';
-    const expectedPassword = process.env.ADMIN_PASSWORD || 'shiva@123';
+    let expectedUsername = (process.env.ADMIN_USERNAME || 'shiva123').trim();
+    let expectedPassword = (process.env.ADMIN_PASSWORD || 'shiva@123').trim();
+
+    // Strip surrounding double quotes if present (common copy-paste issue)
+    if (expectedUsername.startsWith('"') && expectedUsername.endsWith('"')) {
+      expectedUsername = expectedUsername.slice(1, -1);
+    }
+    if (expectedPassword.startsWith('"') && expectedPassword.endsWith('"')) {
+      expectedPassword = expectedPassword.slice(1, -1);
+    }
 
     if (
       username &&
-      username.toLowerCase() === expectedUsername.toLowerCase() &&
+      username.toLowerCase().trim() === expectedUsername.toLowerCase() &&
       password === expectedPassword
     ) {
       return NextResponse.json({ success: true });
