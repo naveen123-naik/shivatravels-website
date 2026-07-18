@@ -5,49 +5,30 @@ import {
   Vehicle,
   Review,
   GalleryItem,
-  TourPackage,
   Destination,
-  Coupon,
-  Booking,
   Driver,
   ContactMessage,
   defaultVehicles,
   defaultDestinations,
-  defaultTourPackages,
   defaultReviews,
   defaultGalleryItems,
-  defaultCoupons,
-  defaultBookings,
   defaultDrivers,
   defaultContactMessages
 } from '../data/defaultMockData';
 
 interface MockDBContextProps {
-  bookings: Booking[];
   vehicles: Vehicle[];
-  packages: TourPackage[];
   destinations: Destination[];
   reviews: Review[];
   gallery: GalleryItem[];
-  coupons: Coupon[];
   drivers: Driver[];
   isLoaded: boolean;
   databaseConfigured: boolean;
-  
-  // Bookings
-  addBooking: (booking: Omit<Booking, 'id' | 'status' | 'bookingDate'>) => Booking;
-  updateBookingStatus: (id: string, status: Booking['status']) => void;
-  toggleFavoriteBooking: (id: string) => void;
   
   // Vehicles
   addVehicle: (vehicle: Omit<Vehicle, 'id'>) => void;
   updateVehicle: (vehicle: Vehicle) => void;
   deleteVehicle: (id: string) => void;
-  
-  // Packages
-  addPackage: (pkg: Omit<TourPackage, 'id'>) => void;
-  updatePackage: (pkg: TourPackage) => void;
-  deletePackage: (id: string) => void;
   
   // Reviews
   addReview: (review: Omit<Review, 'id' | 'date'>) => void;
@@ -55,11 +36,6 @@ interface MockDBContextProps {
   // Gallery
   addGalleryItem: (item: Omit<GalleryItem, 'id'>) => Promise<void>;
   deleteGalleryItem: (id: string) => Promise<void>;
-  
-  // Coupons
-  addCoupon: (coupon: Coupon) => void;
-  updateCoupon: (coupon: Coupon) => void;
-  deleteCoupon: (code: string) => void;
 
   // Drivers
   addDriver: (driver: Omit<Driver, 'id'>) => void;
@@ -76,13 +52,10 @@ interface MockDBContextProps {
 const MockDBContext = createContext<MockDBContextProps | undefined>(undefined);
 
 export const MockDBProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [bookings, setBookings] = useState<Booking[]>([]);
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
-  const [packages, setPackages] = useState<TourPackage[]>([]);
   const [destinations, setDestinations] = useState<Destination[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [gallery, setGallery] = useState<GalleryItem[]>([]);
-  const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [messages, setMessages] = useState<ContactMessage[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -100,13 +73,10 @@ export const MockDBProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           console.log('PostgreSQL database detected. Syncing all tables with Supabase.');
           setDatabaseConfigured(true);
           
-          setBookings(json.data.bookings || []);
           setVehicles(json.data.vehicles || []);
-          setPackages(json.data.packages || []);
           setDestinations(json.data.destinations || []);
           setReviews(json.data.reviews || []);
           setGallery(json.data.gallery || []);
-          setCoupons(json.data.coupons || []);
           setDrivers(json.data.drivers || []);
           setMessages(json.data.messages || []);
           
@@ -125,32 +95,17 @@ export const MockDBProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     const loadFromLocalStorage = () => {
       try {
         console.log('Running in client-side LocalStorage database mode.');
-        const localBookings = localStorage.getItem('snt_bookings');
         const localVehicles = localStorage.getItem('snt_vehicles');
-        const localPackages = localStorage.getItem('snt_packages');
         const localDestinations = localStorage.getItem('snt_destinations');
         const localReviews = localStorage.getItem('snt_reviews');
         const localGallery = localStorage.getItem('snt_gallery');
-        const localCoupons = localStorage.getItem('snt_coupons');
         const localDrivers = localStorage.getItem('snt_drivers');
         const localMessages = localStorage.getItem('snt_messages');
-
-        if (localBookings) setBookings(JSON.parse(localBookings));
-        else {
-          setBookings(defaultBookings);
-          localStorage.setItem('snt_bookings', JSON.stringify(defaultBookings));
-        }
 
         if (localVehicles) setVehicles(JSON.parse(localVehicles));
         else {
           setVehicles(defaultVehicles);
           localStorage.setItem('snt_vehicles', JSON.stringify(defaultVehicles));
-        }
-
-        if (localPackages) setPackages(JSON.parse(localPackages));
-        else {
-          setPackages(defaultTourPackages);
-          localStorage.setItem('snt_packages', JSON.stringify(defaultTourPackages));
         }
 
         if (localDestinations) setDestinations(JSON.parse(localDestinations));
@@ -174,12 +129,6 @@ export const MockDBProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           }
         }
 
-        if (localCoupons) setCoupons(JSON.parse(localCoupons));
-        else {
-          setCoupons(defaultCoupons);
-          localStorage.setItem('snt_coupons', JSON.stringify(defaultCoupons));
-        }
-
         if (localDrivers) setDrivers(JSON.parse(localDrivers));
         else {
           setDrivers(defaultDrivers);
@@ -194,12 +143,9 @@ export const MockDBProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       } catch (e) {
         console.warn('LocalStorage database read/seed blocked, using memory variables:', e);
         // fallback states
-        setBookings(defaultBookings);
         setVehicles(defaultVehicles);
-        setPackages(defaultTourPackages);
         setDestinations(defaultDestinations);
         setReviews(defaultReviews);
-        setCoupons(defaultCoupons);
         setDrivers(defaultDrivers);
         setMessages(defaultContactMessages);
         if (!galleryLoadedFromDb.current) setGallery(defaultGalleryItems);
@@ -218,68 +164,6 @@ export const MockDBProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         localStorage.setItem(key, JSON.stringify(data));
       } catch (e) {
         console.warn('LocalStorage write blocked:', e);
-      }
-    }
-  };
-
-  // BOOKINGS
-  const addBooking = (newBookingData: Omit<Booking, 'id' | 'status' | 'bookingDate'>) => {
-    const randomId = `SNT-${Math.floor(10000 + Math.random() * 90000)}`;
-    const newBooking: Booking = {
-      ...newBookingData,
-      id: randomId,
-      status: 'Pending',
-      bookingDate: new Date().toISOString(),
-      favorite: false
-    };
-    
-    const updated = [newBooking, ...bookings];
-    setBookings(updated);
-    saveToStorage('snt_bookings', updated);
-
-    if (databaseConfigured) {
-      fetch('/api/db', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ entity: 'bookings', data: newBooking })
-      }).catch(err => console.error('Failed to sync booking to PostgreSQL:', err));
-    }
-
-    return newBooking;
-  };
-
-  const updateBookingStatus = (id: string, status: Booking['status']) => {
-    const updated = bookings.map(b => b.id === id ? { ...b, status } : b);
-    setBookings(updated);
-    saveToStorage('snt_bookings', updated);
-
-    if (databaseConfigured) {
-      const target = updated.find(b => b.id === id);
-      if (target) {
-        fetch('/api/db', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ entity: 'bookings', data: target })
-        }).catch(err => console.error('Failed to update booking status in DB:', err));
-      }
-    }
-  };
-
-  const toggleFavoriteBooking = (id: string) => {
-    const booking = bookings.find(b => b.id === id);
-    const newFav = booking ? !booking.favorite : false;
-    const updated = bookings.map(b => b.id === id ? { ...b, favorite: newFav } : b);
-    setBookings(updated);
-    saveToStorage('snt_bookings', updated);
-
-    if (databaseConfigured) {
-      const target = updated.find(b => b.id === id);
-      if (target) {
-        fetch('/api/db', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ entity: 'bookings', data: target })
-        }).catch(err => console.error('Failed to toggle favorite in DB:', err));
       }
     }
   };
@@ -330,52 +214,6 @@ export const MockDBProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   };
 
-  // PACKAGES
-  const addPackage = (pkgData: Omit<TourPackage, 'id'>) => {
-    const randomId = `p-${Math.floor(100 + Math.random() * 900)}`;
-    const newPkg: TourPackage = {
-      ...pkgData,
-      id: randomId
-    };
-    const updated = [...packages, newPkg];
-    setPackages(updated);
-    saveToStorage('snt_packages', updated);
-
-    if (databaseConfigured) {
-      fetch('/api/db', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ entity: 'packages', data: newPkg })
-      }).catch(err => console.error('Failed to add package to DB:', err));
-    }
-  };
-
-  const deletePackage = (id: string) => {
-    const updated = packages.filter(p => p.id !== id);
-    setPackages(updated);
-    saveToStorage('snt_packages', updated);
-
-    if (databaseConfigured) {
-      fetch(`/api/db?entity=packages&id=${encodeURIComponent(id)}`, {
-        method: 'DELETE'
-      }).catch(err => console.error('Failed to delete package from DB:', err));
-    }
-  };
-
-  const updatePackage = (updatedPkg: TourPackage) => {
-    const updated = packages.map(p => p.id === updatedPkg.id ? updatedPkg : p);
-    setPackages(updated);
-    saveToStorage('snt_packages', updated);
-
-    if (databaseConfigured) {
-      fetch('/api/db', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ entity: 'packages', data: updatedPkg })
-      }).catch(err => console.error('Failed to update package in DB:', err));
-    }
-  };
-
   // REVIEWS
   const addReview = (reviewData: Omit<Review, 'id' | 'date'>) => {
     const randomId = `r-${Math.floor(100 + Math.random() * 900)}`;
@@ -398,91 +236,58 @@ export const MockDBProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   // GALLERY
-  const addGalleryItem = async (itemData: Omit<GalleryItem, 'id'>): Promise<void> => {
-    if (databaseConfigured) {
-      try {
-        const res = await fetch('/api/gallery', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(itemData),
-        });
-        const json = await res.json();
-        if (json.success && json.data) {
-          setGallery(prev => [json.data as GalleryItem, ...prev]);
-          return;
-        }
-        throw new Error(json.error || 'API error');
-      } catch (e) {
-        console.error('Failed to add gallery item via API, falling back to LocalStorage:', e);
-      }
-    }
+  const addGalleryItem = async (itemData: Omit<GalleryItem, 'id'>) => {
     const randomId = `g-${Math.floor(100 + Math.random() * 900)}`;
-    const newItem: GalleryItem = { ...itemData, id: randomId };
+    const newItem: GalleryItem = {
+      ...itemData,
+      id: randomId
+    };
+    
+    // Optimistic UI update
     const updated = [newItem, ...gallery];
     setGallery(updated);
     saveToStorage('snt_gallery', updated);
-  };
 
-  const deleteGalleryItem = async (id: string): Promise<void> => {
     if (databaseConfigured) {
       try {
-        const res = await fetch(`/api/gallery?id=${encodeURIComponent(id)}`, {
-          method: 'DELETE',
+        const res = await fetch('/api/db', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ entity: 'gallery', data: newItem })
         });
         const json = await res.json();
-        if (json.success) {
-          setGallery(prev => prev.filter(g => g.id !== id));
-          return;
+        if (!json.success) {
+          throw new Error(json.error || 'API failed');
         }
-        throw new Error(json.error || 'API error');
-      } catch (e) {
-        console.error('Failed to delete gallery item via API, falling back to LocalStorage:', e);
+      } catch (err) {
+        console.error('Failed to sync gallery item to DB:', err);
+        // Rollback optimistic update on failure
+        const rollback = gallery.filter(g => g.id !== randomId);
+        setGallery(rollback);
+        saveToStorage('snt_gallery', rollback);
+        throw err;
+      }
+    }
+  };
+
+  const deleteGalleryItem = async (id: string) => {
+    if (databaseConfigured) {
+      try {
+        const res = await fetch(`/api/db?entity=gallery&id=${encodeURIComponent(id)}`, {
+          method: 'DELETE'
+        });
+        const json = await res.json();
+        if (!json.success) {
+          throw new Error(json.error || 'API failed');
+        }
+      } catch (err) {
+        console.error('Failed to delete gallery item from DB:', err);
+        throw err;
       }
     }
     const updated = gallery.filter(g => g.id !== id);
     setGallery(updated);
     saveToStorage('snt_gallery', updated);
-  };
-
-  // COUPONS
-  const addCoupon = (coupon: Coupon) => {
-    const updated = [...coupons, coupon];
-    setCoupons(updated);
-    saveToStorage('snt_coupons', updated);
-
-    if (databaseConfigured) {
-      fetch('/api/db', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ entity: 'coupons', data: coupon })
-      }).catch(err => console.error('Failed to sync coupon to DB:', err));
-    }
-  };
-
-  const deleteCoupon = (code: string) => {
-    const updated = coupons.filter(c => c.code !== code);
-    setCoupons(updated);
-    saveToStorage('snt_coupons', updated);
-
-    if (databaseConfigured) {
-      fetch(`/api/db?entity=coupons&id=${encodeURIComponent(code)}`, {
-        method: 'DELETE'
-      }).catch(err => console.error('Failed to delete coupon from DB:', err));
-    }
-  };
-
-  const updateCoupon = (updatedCoupon: Coupon) => {
-    const updated = coupons.map(c => c.code === updatedCoupon.code ? updatedCoupon : c);
-    setCoupons(updated);
-    saveToStorage('snt_coupons', updated);
-
-    if (databaseConfigured) {
-      fetch('/api/db', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ entity: 'coupons', data: updatedCoupon })
-      }).catch(err => console.error('Failed to update coupon in DB:', err));
-    }
   };
 
   // DRIVERS
@@ -585,31 +390,19 @@ export const MockDBProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   return (
     <MockDBContext.Provider
       value={{
-        bookings,
         vehicles,
-        packages,
         destinations,
         reviews,
         gallery,
-        coupons,
         drivers,
         isLoaded,
         databaseConfigured,
-        addBooking,
-        updateBookingStatus,
-        toggleFavoriteBooking,
         addVehicle,
         updateVehicle,
         deleteVehicle,
-        addPackage,
-        updatePackage,
-        deletePackage,
         addReview,
         addGalleryItem,
         deleteGalleryItem,
-        addCoupon,
-        updateCoupon,
-        deleteCoupon,
         addDriver,
         updateDriver,
         deleteDriver,

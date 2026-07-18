@@ -4,18 +4,14 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { useLanguage } from '@/context/LanguageContext';
 import { useMockDB } from '@/context/MockDBContext';
-import { MapPin, Navigation, Clock, CreditCard } from 'lucide-react';
+import { MapPin, Navigation, Clock } from 'lucide-react';
 
 export const Destinations: React.FC = () => {
   const { t } = useLanguage();
   const { destinations } = useMockDB();
 
-  const handleSelectDestination = (destName: string) => {
-    // Dispatch a custom event to notify BookingForm/Estimator about destination pre-selection
-    const event = new CustomEvent('preselect-destination', { detail: { destination: destName } });
-    window.dispatchEvent(event);
-
-    const element = document.getElementById('booking-section');
+  const handleSelectDestination = () => {
+    const element = document.getElementById('contact');
     if (element) {
       const offset = 80;
       const bodyRect = document.body.getBoundingClientRect().top;
@@ -61,7 +57,7 @@ export const Destinations: React.FC = () => {
               viewport={{ once: true, margin: '-50px' }}
               transition={{ duration: 0.4, delay: (idx % 5) * 0.05 }}
               className="group relative h-80 rounded-2xl overflow-hidden shadow-md cursor-pointer hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300"
-              onClick={() => handleSelectDestination(dest.name)}
+              onClick={handleSelectDestination}
             >
               {/* Image background */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -111,7 +107,7 @@ export const Destinations: React.FC = () => {
                     </span>
                   </div>
                   <span className="text-[10px] font-extrabold bg-gold-500 hover:bg-gold-600 text-navy-850 px-3 py-1.5 rounded-lg group-hover:scale-105 transition-transform duration-200">
-                    Book Now
+                    Enquire Now
                   </span>
                 </div>
               </div>

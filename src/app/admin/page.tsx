@@ -3,25 +3,19 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useMockDB } from '@/context/MockDBContext';
-import { Booking, Vehicle, TourPackage, Coupon, Review, Driver, GalleryItem } from '@/data/defaultMockData';
+import { Vehicle, Review, Driver, GalleryItem } from '@/data/defaultMockData';
 import {
-  LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as ChartTooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, Legend
+  PieChart, Pie, Cell, Legend, ResponsiveContainer
 } from 'recharts';
 import {
-  ShieldAlert, ShieldCheck, LogOut, ArrowLeft, RefreshCw,
-  TrendingUp, Users, Calendar, BadgeIndianRupee, Car,
-  Plus, Edit, Trash2, Check, X, ClipboardCheck, LayoutDashboard,
-  Star, Tag, Image as ImageIcon, Mail
+  LogOut, Users, Car, Plus, Edit, Trash2, Check, X,
+  LayoutDashboard, Star, Image as ImageIcon, Mail
 } from 'lucide-react';
 
 export default function AdminPage() {
   const {
-    bookings, vehicles, packages, reviews, gallery, coupons, drivers, isLoaded,
-    updateBookingStatus, toggleFavoriteBooking,
+    vehicles, reviews, gallery, drivers, isLoaded,
     addVehicle, updateVehicle, deleteVehicle,
-    addPackage, updatePackage, deletePackage,
-    addCoupon, updateCoupon, deleteCoupon,
     addDriver, updateDriver, deleteDriver,
     addGalleryItem, deleteGalleryItem,
     messages, updateMessageStatus, deleteMessage
@@ -35,7 +29,7 @@ export default function AdminPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Dashboard state
-  const [activeTab, setActiveTab] = useState<'overview' | 'bookings' | 'fleet' | 'packages' | 'drivers' | 'reviews' | 'gallery' | 'messages'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'fleet' | 'drivers' | 'reviews' | 'gallery' | 'messages'>('overview');
 
   // Form states for Gallery
   const [isGalleryModalOpen, setIsGalleryModalOpen] = useState(false);
@@ -56,34 +50,6 @@ export default function AdminPage() {
   const [vehiclePrice, setVehiclePrice] = useState(13);
   const [vehicleAllowance, setVehicleAllowance] = useState(350);
   const [vehicleFeatures, setVehicleFeatures] = useState('');
-
-  // Form states for Packages
-  const [isPackageModalOpen, setIsPackageModalOpen] = useState(false);
-  const [pkgDestination, setPkgDestination] = useState('');
-  const [pkgDuration, setPkgDuration] = useState('');
-  const [pkgPrice, setPkgPrice] = useState(4999);
-  const [pkgPlaces, setPkgPlaces] = useState('');
-  const [pkgVehicle, setPkgVehicle] = useState('');
-  const [pkgHotel, setPkgHotel] = useState(false);
-  const [pkgMeals, setPkgMeals] = useState(false);
-  const [pkgImage, setPkgImage] = useState('');
-
-  // Form states for Coupons
-  const [isCouponModalOpen, setIsCouponModalOpen] = useState(false);
-  const [couponCode, setCouponCode] = useState('');
-  const [couponType, setCouponType] = useState<'percentage' | 'fixed'>('percentage');
-  const [couponValue, setCouponValue] = useState(10);
-  const [couponMin, setCouponMin] = useState(1000);
-  const [couponDesc, setCouponDesc] = useState('');
-
-  // Inline edit states — Packages
-  const [editingPkgId, setEditingPkgId] = useState<string | null>(null);
-  const [editingPkgPrice, setEditingPkgPrice] = useState('');
-
-  // Inline edit states — Coupons
-  const [editingCouponCode, setEditingCouponCode] = useState<string | null>(null);
-  const [editingCouponValue, setEditingCouponValue] = useState('');
-  const [editingCouponMin, setEditingCouponMin] = useState('');
 
   // Form states for Drivers
   const [isDriverModalOpen, setIsDriverModalOpen] = useState(false);
@@ -139,45 +105,8 @@ export default function AdminPage() {
   // -------------------------------------------------------------
   // ANALYTICS CALCULATIONS
   // -------------------------------------------------------------
-  // Total Revenue (Approved + Completed bookings)
-  const totalRevenue = bookings
-    .filter((b) => b.status === 'Approved' || b.status === 'Completed')
-    .reduce((sum, b) => sum + b.totalFare, 0);
-
-  // Revenue trend data (Recharts chart)
-  const getRevenueTrendData = () => {
-    const dates: Record<string, number> = {};
-    
-    // Sort bookings by date ascending
-    const sorted = [...bookings].sort((a, b) => 
-      new Date(a.bookingDate).getTime() - new Date(b.bookingDate).getTime()
-    );
-
-    sorted.forEach((b) => {
-      if (b.status === 'Approved' || b.status === 'Completed') {
-        const dateStr = new Date(b.bookingDate).toLocaleDateString('en-IN', {
-          month: 'short',
-          day: 'numeric'
-        });
-        dates[dateStr] = (dates[dateStr] || 0) + b.totalFare;
-      }
-    });
-
-    return Object.entries(dates).map(([date, revenue]) => ({ date, Revenue: revenue }));
-  };
-
-  // Bookings by Vehicle category (Recharts bar chart)
-  const getBookingsByVehicleCategory = () => {
-    const counts: Record<string, number> = {};
-    
-    bookings.forEach((b) => {
-      const v = vehicles.find((vehicle) => vehicle.id === b.vehicleId);
-      const cat = v ? v.category : 'Other';
-      counts[cat] = (counts[cat] || 0) + 1;
-    });
-
-    return Object.entries(counts).map(([name, count]) => ({ name, Bookings: count }));
-  };
+  // Average Rating
+  const averageRating = (reviews.reduce((sum, r) => sum + r.rating, 0) / (reviews.length || 1)).toFixed(1);
 
   // Vehicle allocation status (Recharts pie chart)
   const getFleetAllocationData = () => {
@@ -195,7 +124,7 @@ export default function AdminPage() {
     ];
   };
 
-  const COLORS = ['#0f4c81', '#fbbf24', '#ef4444', '#10b981'];
+  const COLORS = ['#0f4c81', '#ef4444'];
 
   // -------------------------------------------------------------
   // VEHICLE CRUD HANDLERS
@@ -267,35 +196,7 @@ export default function AdminPage() {
     setIsVehicleModalOpen(false);
   };
 
-  // -------------------------------------------------------------
-  // TOUR PACKAGE CRUD HANDLERS
-  // -------------------------------------------------------------
-  const handleSavePackage = (e: React.FormEvent) => {
-    e.preventDefault();
-    const placesArray = pkgPlaces.split(',').map((p) => p.trim()).filter(Boolean);
 
-    addPackage({
-      destination: pkgDestination,
-      duration: pkgDuration,
-      price: pkgPrice,
-      placesCovered: placesArray,
-      vehicleIncluded: pkgVehicle || 'Sedan',
-      hotelIncluded: pkgHotel,
-      mealsIncluded: pkgMeals,
-      image: pkgImage || 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=600&auto=format&fit=crop',
-    });
-
-    // Reset Form
-    setPkgDestination('');
-    setPkgDuration('');
-    setPkgPrice(4999);
-    setPkgPlaces('');
-    setPkgVehicle('');
-    setPkgHotel(false);
-    setPkgMeals(false);
-    setPkgImage('');
-    setIsPackageModalOpen(false);
-  };
 
   // -------------------------------------------------------------
   // DRIVER CRUD HANDLERS
@@ -347,28 +248,7 @@ export default function AdminPage() {
     setIsDriverModalOpen(false);
   };
 
-  // -------------------------------------------------------------
-  // COUPON CRUD HANDLERS
-  // -------------------------------------------------------------
-  const handleSaveCoupon = (e: React.FormEvent) => {
-    e.preventDefault();
 
-    addCoupon({
-      code: couponCode.toUpperCase().trim(),
-      discountType: couponType,
-      value: couponValue,
-      minBookingValue: couponMin,
-      description: couponDesc,
-    });
-
-    // Reset Form
-    setCouponCode('');
-    setCouponType('percentage');
-    setCouponValue(10);
-    setCouponMin(1000);
-    setCouponDesc('');
-    setIsCouponModalOpen(false);
-  };
 
   // -------------------------------------------------------------
   // GALLERY CRUD HANDLERS
@@ -571,18 +451,6 @@ export default function AdminPage() {
           </button>
 
           <button
-            onClick={() => setActiveTab('bookings')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-left transition-all ${
-              activeTab === 'bookings'
-                ? 'bg-gold-500 text-navy-850 shadow-md font-extrabold'
-                : 'hover:bg-slate-900 text-slate-400 hover:text-white'
-            }`}
-          >
-            <ClipboardCheck size={16} />
-            <span>Reservations ({bookings.length})</span>
-          </button>
-
-          <button
             onClick={() => setActiveTab('drivers')}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-left transition-all ${
               activeTab === 'drivers'
@@ -619,18 +487,6 @@ export default function AdminPage() {
           </button>
 
           <button
-            onClick={() => setActiveTab('packages')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-left transition-all ${
-              activeTab === 'packages'
-                ? 'bg-gold-500 text-navy-850 shadow-md font-extrabold'
-                : 'hover:bg-slate-900 text-slate-400 hover:text-white'
-            }`}
-          >
-            <Tag size={16} />
-            <span>Packages & Coupons ({packages.length})</span>
-          </button>
-
-          <button
             onClick={() => setActiveTab('gallery')}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-left transition-all ${
               activeTab === 'gallery'
@@ -664,32 +520,22 @@ export default function AdminPage() {
               {/* Stat Row */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex items-center gap-5">
-                  <div className="w-12 h-12 rounded-2xl bg-gold-500/10 border border-gold-500/20 flex items-center justify-center shrink-0">
-                    <TrendingUp className="text-gold-500" size={24} />
+                  <div className="w-12 h-12 rounded-2xl bg-green-500/10 border border-green-500/20 flex items-center justify-center shrink-0">
+                    <Car className="text-green-400" size={24} />
                   </div>
                   <div>
-                    <span className="block text-[10px] uppercase font-bold text-slate-450 tracking-wider">Total Sales (Approved)</span>
-                    <span className="text-2xl font-black text-white">₹{totalRevenue.toLocaleString('en-IN')}</span>
+                    <span className="block text-[10px] uppercase font-bold text-slate-400 tracking-wider">Active Fleet Size</span>
+                    <span className="text-2xl font-black text-white">{vehicles.length} Vehicles</span>
                   </div>
                 </div>
 
                 <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex items-center gap-5">
                   <div className="w-12 h-12 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center shrink-0">
-                    <Calendar className="text-blue-400" size={24} />
+                    <Users className="text-blue-400" size={24} />
                   </div>
                   <div>
-                    <span className="block text-[10px] uppercase font-bold text-slate-455 tracking-wider">Total Bookings</span>
-                    <span className="text-2xl font-black text-white">{bookings.length}</span>
-                  </div>
-                </div>
-
-                <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex items-center gap-5">
-                  <div className="w-12 h-12 rounded-2xl bg-green-500/10 border border-green-500/20 flex items-center justify-center shrink-0">
-                    <Car className="text-green-400" size={24} />
-                  </div>
-                  <div>
-                    <span className="block text-[10px] uppercase font-bold text-slate-450 tracking-wider">Active Fleet Size</span>
-                    <span className="text-2xl font-black text-white">{vehicles.length} Vehicles</span>
+                    <span className="block text-[10px] uppercase font-bold text-slate-400 tracking-wider">Total Drivers</span>
+                    <span className="text-2xl font-black text-white">{drivers.length} Drivers</span>
                   </div>
                 </div>
 
@@ -698,40 +544,30 @@ export default function AdminPage() {
                     <Star className="text-yellow-400" size={24} />
                   </div>
                   <div>
-                    <span className="block text-[10px] uppercase font-bold text-slate-450 tracking-wider">Average Rating</span>
+                    <span className="block text-[10px] uppercase font-bold text-slate-400 tracking-wider">Average Rating</span>
                     <span className="text-2xl font-black text-white">
-                      {(reviews.reduce((sum, r) => sum + r.rating, 0) / (reviews.length || 1)).toFixed(1)} / 5.0
+                      {averageRating} / 5.0
                     </span>
+                  </div>
+                </div>
+
+                <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex items-center gap-5">
+                  <div className="w-12 h-12 rounded-2xl bg-gold-500/10 border border-gold-500/20 flex items-center justify-center shrink-0">
+                    <Mail className="text-gold-500" size={24} />
+                  </div>
+                  <div>
+                    <span className="block text-[10px] uppercase font-bold text-slate-400 tracking-wider">Inquiries Received</span>
+                    <span className="text-2xl font-black text-white">{messages.length} Messages</span>
                   </div>
                 </div>
               </div>
 
               {/* Chart Grids */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                
-                {/* Revenue trends */}
-                <div className="lg:col-span-8 bg-slate-900 border border-slate-800 rounded-3xl p-6">
-                  <h3 className="font-extrabold text-base mb-6 tracking-wide text-slate-205 flex items-center gap-2">
-                    <TrendingUp size={16} className="text-gold-500" />
-                    Revenue Trend Timeline (Approved/Completed Sales)
-                  </h3>
-                  <div className="h-80 w-full text-xs">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={getRevenueTrendData()}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-                        <XAxis dataKey="date" stroke="#94a3b8" />
-                        <YAxis stroke="#94a3b8" />
-                        <ChartTooltip contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #334155' }} />
-                        <Line type="monotone" dataKey="Revenue" stroke="#d4af37" strokeWidth={3} activeDot={{ r: 8 }} />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  </div>
-                </div>
-
                 {/* Fleet availability ratio */}
-                <div className="lg:col-span-4 bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col justify-between">
+                <div className="lg:col-span-6 bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col justify-between">
                   <div>
-                    <h3 className="font-extrabold text-base mb-6 tracking-wide text-slate-205 flex items-center gap-2">
+                    <h3 className="font-extrabold text-base mb-6 tracking-wide text-slate-200 flex items-center gap-2">
                       <Car size={16} className="text-gold-500" />
                       Fleet Allocation Status
                     </h3>
@@ -757,149 +593,11 @@ export default function AdminPage() {
                     </div>
                   </div>
                 </div>
-
-                {/* Bookings category category */}
-                <div className="lg:col-span-12 bg-slate-900 border border-slate-800 rounded-3xl p-6">
-                  <h3 className="font-extrabold text-base mb-6 tracking-wide text-slate-205 flex items-center gap-2">
-                    <Users size={16} className="text-gold-500" />
-                    Bookings Count by Vehicle Category
-                  </h3>
-                  <div className="h-80 w-full text-xs">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={getBookingsByVehicleCategory()}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-                        <XAxis dataKey="name" stroke="#94a3b8" />
-                        <YAxis stroke="#94a3b8" />
-                        <ChartTooltip contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #334155' }} />
-                        <Bar dataKey="Bookings" fill="#d4af37">
-                          {getBookingsByVehicleCategory().map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                          ))}
-                        </Bar>
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
-                </div>
-
               </div>
             </div>
           )}
 
-          {/* TAB 2: BOOKINGS LIST & STATUS ADMIN */}
-          {activeTab === 'bookings' && (
-            <div className="space-y-6 animate-[fadeIn_0.3s_ease-out]">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xl font-extrabold text-white tracking-wide">
-                  Reservations Terminal ({bookings.length} Bookings)
-                </h3>
-              </div>
 
-              <div className="bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs border-collapse">
-                    <thead>
-                      <tr className="bg-navy-950 text-slate-400 font-extrabold uppercase border-b border-slate-800">
-                        <th className="p-4">Reference ID</th>
-                        <th className="p-4">Customer Details</th>
-                        <th className="p-4">Trip Specifications</th>
-                        <th className="p-4">Calculated Fare</th>
-                        <th className="p-4 text-center">Status</th>
-                        <th className="p-4 text-center">Action Controls</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-800/60 font-semibold text-slate-300">
-                      {bookings.map((booking) => (
-                        <tr key={booking.id} className="hover:bg-slate-800/40 transition-colors">
-                          <td className="p-4 font-bold text-white">
-                            <button
-                              onClick={() => toggleFavoriteBooking(booking.id)}
-                              className="mr-2 text-slate-500 hover:text-yellow-500 transition-colors"
-                            >
-                              {booking.favorite ? '⭐' : '☆'}
-                            </button>
-                            {booking.id}
-                          </td>
-                          <td className="p-4">
-                            <span className="block text-white font-bold">{booking.fullName}</span>
-                            <span className="block text-[10px] text-slate-450">{booking.mobileNumber}</span>
-                          </td>
-                          <td className="p-4">
-                            <span className="block text-slate-200">
-                              <b>{booking.tripType}</b> ({booking.vehicleName})
-                            </span>
-                            <span className="block text-[10px] text-slate-450 mt-0.5">
-                              {booking.pickupLocation} → {booking.destination}
-                            </span>
-                            <span className="block text-[10px] text-slate-450">
-                              {booking.pickupDate} @ {booking.pickupTime}
-                            </span>
-                          </td>
-                          <td className="p-4">
-                            <span className="text-gold-500 font-extrabold">
-                              {booking.totalFare > 0 ? `₹${booking.totalFare}` : 'Pending Quote'}
-                            </span>
-                            {booking.discountApplied > 0 && (
-                              <span className="block text-[9px] text-green-500">
-                                Saved ₹{booking.discountApplied} ({booking.couponCode})
-                              </span>
-                            )}
-                          </td>
-                          <td className="p-4 text-center">
-                            <span className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold border ${
-                              booking.status === 'Pending' ? 'bg-amber-500/10 border-amber-500/20 text-amber-400' :
-                              booking.status === 'Approved' ? 'bg-blue-500/10 border-blue-500/20 text-blue-400' :
-                              booking.status === 'Completed' ? 'bg-green-500/10 border-green-500/20 text-green-400' :
-                              'bg-red-500/10 border-red-500/20 text-red-400'
-                            }`}>
-                              {booking.status}
-                            </span>
-                          </td>
-                          <td className="p-4 text-center">
-                            <div className="flex justify-center items-center gap-1.5">
-                              {booking.status === 'Pending' && (
-                                <>
-                                  <button
-                                    onClick={() => updateBookingStatus(booking.id, 'Approved')}
-                                    className="p-1.5 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors cursor-pointer"
-                                    title="Approve Booking"
-                                  >
-                                    <Check size={14} />
-                                  </button>
-                                  <button
-                                    onClick={() => updateBookingStatus(booking.id, 'Rejected')}
-                                    className="p-1.5 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors cursor-pointer"
-                                    title="Reject Booking"
-                                  >
-                                    <X size={14} />
-                                  </button>
-                                </>
-                              )}
-                              {booking.status === 'Approved' && (
-                                <button
-                                  onClick={() => updateBookingStatus(booking.id, 'Completed')}
-                                  className="py-1 px-2.5 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors cursor-pointer flex items-center gap-1 text-[10px] font-bold"
-                                  title="Mark as Completed"
-                                >
-                                  <Check size={10} />
-                                  Complete
-                                </button>
-                              )}
-                              {booking.status === 'Completed' && (
-                                <span className="text-[10px] text-slate-500 font-extrabold">Settled</span>
-                              )}
-                              {booking.status === 'Rejected' && (
-                                <span className="text-[10px] text-red-400/60 font-extrabold">Cancelled</span>
-                              )}
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          )}
 
           {/* TAB 3: FLEET CRUD INVENTORY */}
           {activeTab === 'fleet' && (
@@ -971,223 +669,6 @@ export default function AdminPage() {
                   </div>
                 ))}
               </div>
-            </div>
-          )}
-
-          {/* TAB 4: TOUR PACKAGES & DISCOUNT COUPONS */}
-          {activeTab === 'packages' && (
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 animate-[fadeIn_0.3s_ease-out]">
-              
-              {/* Packages panel */}
-              <div className="lg:col-span-7 space-y-6">
-                <div className="flex items-center justify-between border-b border-slate-900 pb-3">
-                  <h3 className="text-lg font-extrabold text-white tracking-wide">
-                    Sightseeing Tour Packages
-                  </h3>
-                  <button
-                    onClick={() => setIsPackageModalOpen(true)}
-                    className="bg-gold-500 hover:bg-gold-600 text-navy-850 font-bold px-3 py-2 rounded-xl text-[10px] flex items-center gap-1 cursor-pointer"
-                  >
-                    <Plus size={14} /> Create Package
-                  </button>
-                </div>
-
-                <div className="space-y-4">
-                  {packages.map((pkg) => (
-                    <div
-                      key={pkg.id}
-                      className="bg-slate-900 border border-slate-800 rounded-3xl p-4 flex items-center justify-between gap-4 font-semibold text-xs"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-14 h-12 rounded-xl overflow-hidden bg-slate-800 shrink-0">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={pkg.image} alt={pkg.destination} className="w-full h-full object-cover" />
-                        </div>
-                        <div>
-                          <h4 className="text-sm font-bold text-white leading-tight">{pkg.destination}</h4>
-                          <span className="text-[10px] text-slate-400 font-semibold">{pkg.duration} | {pkg.vehicleIncluded}</span>
-                        </div>
-                      </div>
-
-                      <div className="text-right shrink-0 flex items-center gap-2">
-                        <div>
-                          <span className="block text-[8px] text-slate-500 uppercase tracking-wider mb-1">Price</span>
-                          {editingPkgId === pkg.id ? (
-                            <div className="flex items-center gap-1">
-                              <span className="text-gold-500 font-extrabold">₹</span>
-                              <input
-                                type="number"
-                                min={0}
-                                value={editingPkgPrice}
-                                onChange={(e) => setEditingPkgPrice(e.target.value)}
-                                onKeyDown={(e) => {
-                                  if (e.key === 'Enter') {
-                                    const newPrice = parseInt(editingPkgPrice);
-                                    if (!isNaN(newPrice) && newPrice >= 0) updatePackage({ ...pkg, price: newPrice });
-                                    setEditingPkgId(null);
-                                  }
-                                  if (e.key === 'Escape') setEditingPkgId(null);
-                                }}
-                                className="w-20 bg-slate-800 border border-gold-500/50 rounded-lg px-2 py-1 text-white text-xs font-bold text-right focus:outline-none focus:border-gold-500"
-                                autoFocus
-                              />
-                              <button
-                                onClick={() => {
-                                  const newPrice = parseInt(editingPkgPrice);
-                                  if (!isNaN(newPrice) && newPrice >= 0) updatePackage({ ...pkg, price: newPrice });
-                                  setEditingPkgId(null);
-                                }}
-                                className="p-1 bg-gold-500 hover:bg-gold-600 text-navy-850 rounded-lg transition-all cursor-pointer"
-                                title="Save price"
-                              >
-                                <Check size={11} />
-                              </button>
-                              <button
-                                onClick={() => setEditingPkgId(null)}
-                                className="p-1 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-lg transition-all cursor-pointer"
-                                title="Cancel"
-                              >
-                                <X size={11} />
-                              </button>
-                            </div>
-                          ) : (
-                            <div className="flex items-center gap-1.5">
-                              <span className="text-sm font-extrabold text-gold-500">₹{pkg.price.toLocaleString()}</span>
-                              <button
-                                onClick={() => { setEditingPkgId(pkg.id); setEditingPkgPrice(String(pkg.price)); }}
-                                className="p-1 text-slate-500 hover:text-gold-400 transition-colors cursor-pointer"
-                                title="Edit price"
-                              >
-                                <Edit size={11} />
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                        <button
-                          onClick={() => {
-                            if (confirm(`Remove package ${pkg.destination}?`)) {
-                              deletePackage(pkg.id);
-                            }
-                          }}
-                          className="p-2 border border-slate-800 hover:border-red-500/20 text-slate-450 hover:text-red-400 bg-slate-950 rounded-xl transition-all cursor-pointer"
-                        >
-                          <Trash2 size={12} />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Coupons panel */}
-              <div className="lg:col-span-5 space-y-6">
-                <div className="flex items-center justify-between border-b border-slate-900 pb-3">
-                  <h3 className="text-lg font-extrabold text-white tracking-wide">
-                    Discount Coupons
-                  </h3>
-                  <button
-                    onClick={() => setIsCouponModalOpen(true)}
-                    className="bg-gold-500 hover:bg-gold-600 text-navy-850 font-bold px-3 py-2 rounded-xl text-[10px] flex items-center gap-1 cursor-pointer"
-                  >
-                    <Plus size={14} /> Add Coupon
-                  </button>
-                </div>
-
-                <div className="space-y-4">
-                  {coupons.map((c) => (
-                    <div
-                      key={c.code}
-                      className="bg-slate-900 border border-slate-800 rounded-3xl p-5 font-semibold text-xs space-y-2 relative"
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="bg-gold-500/10 border border-gold-500/30 text-gold-500 px-3 py-1 rounded-lg text-xs font-black uppercase tracking-wider">
-                          {c.code}
-                        </span>
-                        
-                        <div className="flex items-center gap-1.5">
-                          <button
-                            onClick={() => {
-                              setEditingCouponCode(c.code);
-                              setEditingCouponValue(String(c.value));
-                              setEditingCouponMin(String(c.minBookingValue));
-                            }}
-                            className="p-1.5 border border-slate-800 hover:border-gold-500/30 text-slate-450 hover:text-gold-400 bg-slate-950 rounded-lg transition-all cursor-pointer"
-                            title="Edit discount"
-                          >
-                            <Edit size={11} />
-                          </button>
-                          <button
-                            onClick={() => deleteCoupon(c.code)}
-                            className="p-1.5 border border-slate-800 hover:border-red-500/20 text-slate-450 hover:text-red-400 bg-slate-950 rounded-lg transition-all cursor-pointer"
-                            title="Delete Code"
-                          >
-                            <Trash2 size={12} />
-                          </button>
-                        </div>
-                      </div>
-                      <p className="text-xs text-white pt-1">{c.description}</p>
-
-                      {/* Inline edit panel */}
-                      {editingCouponCode === c.code ? (
-                        <div className="border border-gold-500/30 rounded-2xl p-3 bg-slate-950 space-y-3">
-                          <p className="text-[9px] text-gold-400 uppercase font-bold tracking-wider">Edit Discount Values</p>
-                          <div className="flex gap-3">
-                            <div className="flex-1">
-                              <label className="block text-[9px] text-slate-500 uppercase mb-1">
-                                {c.discountType === 'percentage' ? 'Discount (%)' : 'Discount (₹)'}
-                              </label>
-                              <input
-                                type="number"
-                                min={0}
-                                value={editingCouponValue}
-                                onChange={(e) => setEditingCouponValue(e.target.value)}
-                                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-2 py-1.5 text-white text-xs font-bold focus:outline-none focus:border-gold-500"
-                              />
-                            </div>
-                            <div className="flex-1">
-                              <label className="block text-[9px] text-slate-500 uppercase mb-1">Min Booking (₹)</label>
-                              <input
-                                type="number"
-                                min={0}
-                                value={editingCouponMin}
-                                onChange={(e) => setEditingCouponMin(e.target.value)}
-                                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-2 py-1.5 text-white text-xs font-bold focus:outline-none focus:border-gold-500"
-                              />
-                            </div>
-                          </div>
-                          <div className="flex gap-2 justify-end">
-                            <button
-                              onClick={() => setEditingCouponCode(null)}
-                              className="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-lg text-[10px] font-bold transition-colors cursor-pointer"
-                            >
-                              Cancel
-                            </button>
-                            <button
-                              onClick={() => {
-                                const v = parseFloat(editingCouponValue);
-                                const m = parseInt(editingCouponMin);
-                                if (!isNaN(v) && !isNaN(m) && v >= 0 && m >= 0) {
-                                  updateCoupon({ ...c, value: v, minBookingValue: m });
-                                }
-                                setEditingCouponCode(null);
-                              }}
-                              className="px-3 py-1.5 bg-gold-500 hover:bg-gold-600 text-navy-850 rounded-lg text-[10px] font-bold transition-colors cursor-pointer flex items-center gap-1"
-                            >
-                              <Check size={11} /> Save
-                            </button>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="flex justify-between items-center text-[10px] text-slate-450 border-t border-slate-800/60 pt-2">
-                          <span>Discount: <b>{c.discountType === 'percentage' ? `${c.value}%` : `₹${c.value}`}</b></span>
-                          <span>Min booking: <b>₹{c.minBookingValue}</b></span>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
             </div>
           )}
 
@@ -1639,230 +1120,7 @@ export default function AdminPage() {
         </div>
       )}
 
-      {/* -------------------------------------------------------------
-          PACKAGE MODAL DIALOG
-      ------------------------------------------------------------- */}
-      {isPackageModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setIsPackageModalOpen(false)} />
-          
-          <div className="bg-slate-900 border border-slate-800 text-white rounded-3xl p-6 w-full max-w-md relative z-10 shadow-2xl">
-            <h3 className="text-lg font-bold text-white mb-6 border-b border-slate-800 pb-3 flex items-center gap-2">
-              <Tag size={18} className="text-gold-500" />
-              Create Custom Tour Package
-            </h3>
 
-            <form onSubmit={handleSavePackage} className="space-y-4 text-xs font-semibold">
-              <div>
-                <label className="block text-[10px] text-slate-400 mb-1.5 uppercase font-bold">Destination Name</label>
-                <input
-                  type="text"
-                  required
-                  value={pkgDestination}
-                  onChange={(e) => setPkgDestination(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-800 bg-navy-950 text-xs font-bold text-white focus:outline-none"
-                  placeholder="e.g. Srisailam Holy Tour"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-[10px] text-slate-400 mb-1.5 uppercase font-bold">Duration (e.g. 2 Days / 1 Night)</label>
-                  <input
-                    type="text"
-                    required
-                    value={pkgDuration}
-                    onChange={(e) => setPkgDuration(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-800 bg-navy-950 text-xs font-bold text-white focus:outline-none"
-                    placeholder="2 Days / 1 Night"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[10px] text-slate-400 mb-1.5 uppercase font-bold">Package Price (₹)</label>
-                  <input
-                    type="number"
-                    required
-                    value={pkgPrice}
-                    onChange={(e) => setPkgPrice(parseInt(e.target.value) || 4999)}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-800 bg-navy-950 text-xs font-bold text-white focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-[10px] text-slate-400 mb-1.5 uppercase font-bold">Places Covered (comma separated)</label>
-                <input
-                  type="text"
-                  required
-                  value={pkgPlaces}
-                  onChange={(e) => setPkgPlaces(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-800 bg-navy-950 text-xs font-bold text-white focus:outline-none"
-                  placeholder="Temple, Waterfall, Dam"
-                />
-              </div>
-
-              <div className="grid grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-[10px] text-slate-400 mb-1.5 uppercase font-bold">Vehicle Included</label>
-                  <input
-                    type="text"
-                    required
-                    value={pkgVehicle}
-                    onChange={(e) => setPkgVehicle(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-800 bg-navy-950 text-xs font-bold text-white focus:outline-none"
-                    placeholder="Sedan / SUV"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[10px] text-slate-400 mb-1.5 uppercase font-bold">Hotel Stay?</label>
-                  <select
-                    value={pkgHotel ? 'yes' : 'no'}
-                    onChange={(e) => setPkgHotel(e.target.value === 'yes')}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-800 bg-navy-950 text-xs font-bold text-white focus:outline-none"
-                  >
-                    <option value="no">No</option>
-                    <option value="yes">Yes</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-[10px] text-slate-400 mb-1.5 uppercase font-bold">Meals Included?</label>
-                  <select
-                    value={pkgMeals ? 'yes' : 'no'}
-                    onChange={(e) => setPkgMeals(e.target.value === 'yes')}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-800 bg-navy-950 text-xs font-bold text-white focus:outline-none"
-                  >
-                    <option value="no">No</option>
-                    <option value="yes">Yes</option>
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-[10px] text-slate-400 mb-1.5 uppercase font-bold">Package Image URL</label>
-                <input
-                  type="text"
-                  value={pkgImage}
-                  onChange={(e) => setPkgImage(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-800 bg-navy-950 text-xs font-bold text-white focus:outline-none"
-                />
-              </div>
-
-              <div className="flex gap-3 mt-6 pt-4 border-t border-slate-800">
-                <button
-                  type="button"
-                  onClick={() => setIsPackageModalOpen(false)}
-                  className="flex-1 py-3 border border-slate-800 text-slate-400 hover:bg-slate-800 rounded-xl transition-colors font-bold"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="flex-1 py-3 bg-gold-500 hover:bg-gold-600 text-navy-850 rounded-xl transition-colors font-extrabold shadow-md hover:shadow-lg"
-                >
-                  Create Package
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* -------------------------------------------------------------
-          COUPON MODAL DIALOG
-      ------------------------------------------------------------- */}
-      {isCouponModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setIsCouponModalOpen(false)} />
-          
-          <div className="bg-slate-900 border border-slate-800 text-white rounded-3xl p-6 w-full max-w-md relative z-10 shadow-2xl">
-            <h3 className="text-lg font-bold text-white mb-6 border-b border-slate-800 pb-3 flex items-center gap-2">
-              <Tag size={18} className="text-gold-500" />
-              Add Discount Coupon
-            </h3>
-
-            <form onSubmit={handleSaveCoupon} className="space-y-4 text-xs font-semibold">
-              <div>
-                <label className="block text-[10px] text-slate-400 mb-1.5 uppercase font-bold">Coupon Promo Code</label>
-                <input
-                  type="text"
-                  required
-                  value={couponCode}
-                  onChange={(e) => setCouponCode(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-800 bg-navy-950 text-xs font-bold text-white focus:outline-none uppercase tracking-wider"
-                  placeholder="e.g. SHIVA200"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-[10px] text-slate-400 mb-1.5 uppercase font-bold">Discount Type</label>
-                  <select
-                    value={couponType}
-                    onChange={(e) => setCouponType(e.target.value as any)}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-800 bg-navy-950 text-xs font-bold text-white focus:outline-none"
-                  >
-                    <option value="percentage">Percentage (%)</option>
-                    <option value="fixed">Fixed Flat (₹)</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-[10px] text-slate-400 mb-1.5 uppercase font-bold">Value (e.g. 10 for 10% / 500 for ₹500)</label>
-                  <input
-                    type="number"
-                    required
-                    value={couponValue}
-                    onChange={(e) => setCouponValue(parseInt(e.target.value) || 0)}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-800 bg-navy-950 text-xs font-bold text-white focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-[10px] text-slate-400 mb-1.5 uppercase font-bold">Minimum Booking Value (₹)</label>
-                <input
-                  type="number"
-                  required
-                  value={couponMin}
-                  onChange={(e) => setCouponMin(parseInt(e.target.value) || 0)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-800 bg-navy-950 text-xs font-bold text-white focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="block text-[10px] text-slate-400 mb-1.5 uppercase font-bold">Display Description</label>
-                <input
-                  type="text"
-                  required
-                  value={couponDesc}
-                  onChange={(e) => setCouponDesc(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-800 bg-navy-950 text-xs font-bold text-white focus:outline-none"
-                  placeholder="e.g. Save flat ₹200 on temple tours."
-                />
-              </div>
-
-              <div className="flex gap-3 mt-6 pt-4 border-t border-slate-800">
-                <button
-                  type="button"
-                  onClick={() => setIsCouponModalOpen(false)}
-                  className="flex-1 py-3 border border-slate-800 text-slate-400 hover:bg-slate-800 rounded-xl transition-colors font-bold"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="flex-1 py-3 bg-gold-500 hover:bg-gold-600 text-navy-850 rounded-xl transition-colors font-extrabold shadow-md hover:shadow-lg"
-                >
-                  Create Coupon
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
 
       {/* -------------------------------------------------------------
           DRIVER MODAL DIALOG

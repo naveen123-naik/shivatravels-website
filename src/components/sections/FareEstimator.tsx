@@ -112,38 +112,7 @@ export const FareEstimator: React.FC = () => {
     });
   };
 
-  const handleBookThisEstimate = () => {
-    if (!estimate || !vehicleId) return;
-    const selectedVehicle = vehicles.find((v) => v.id === vehicleId);
-    if (!selectedVehicle) return;
 
-    // Dispatch custom event to autofill booking form
-    const event = new CustomEvent('preselect-estimate', {
-      detail: {
-        pickupLocation: pickup,
-        destination,
-        vehicleId,
-        vehicleName: selectedVehicle.name,
-        estimatedFare: estimate.total,
-        specialInstructions: `Estimated Fare: ₹${estimate.total} (Dist: ${estimate.distance}km, Days: ${estimate.days}, Toll: ₹${estimate.toll})`
-      }
-    });
-    window.dispatchEvent(event);
-
-    const element = document.getElementById('booking-section');
-    if (element) {
-      const offset = 80;
-      const bodyRect = document.body.getBoundingClientRect().top;
-      const elementRect = element.getBoundingClientRect().top;
-      const elementPosition = elementRect - bodyRect;
-      const offsetPosition = elementPosition - offset;
-
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth',
-      });
-    }
-  };
 
   return (
     <section id="estimator" className="py-20 bg-slate-50 dark:bg-navy-950/20 relative">
@@ -301,12 +270,29 @@ export const FareEstimator: React.FC = () => {
                       {t.estimator.note}
                     </p>
 
-                    <button
-                      onClick={handleBookThisEstimate}
-                      className="w-full py-4 bg-gold-500 hover:bg-gold-600 text-navy-850 font-extrabold rounded-xl shadow-lg hover:shadow-gold-500/20 transition-all duration-200 cursor-pointer"
-                    >
-                      Book with this Estimate
-                    </button>
+                    <div className="flex flex-col sm:flex-row gap-3">
+                      <a
+                        href="tel:+918074324003"
+                        className="flex-1 py-4 bg-gold-500 hover:bg-gold-600 text-navy-850 font-extrabold rounded-xl shadow-lg hover:shadow-gold-500/20 transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 text-sm text-center"
+                      >
+                        Call to Book
+                      </a>
+                      <a
+                        href={`https://wa.me/918074324003?text=${encodeURIComponent(
+                          `Hi Shiva Travels, I would like to book a trip.\n` +
+                          `- Pickup: ${pickup}\n` +
+                          `- Destination: ${destination}\n` +
+                          `- Vehicle: ${vehicles.find((v) => v.id === vehicleId)?.name || ''}\n` +
+                          `- Estimated Distance: ${estimate.distance} km\n` +
+                          `- Estimated Fare: ₹${estimate.total}`
+                        )}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex-1 py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl shadow-lg hover:shadow-emerald-600/20 transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 text-sm text-center"
+                      >
+                        WhatsApp to Book
+                      </a>
+                    </div>
                   </div>
                 </motion.div>
               ) : (

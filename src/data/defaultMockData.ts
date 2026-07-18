@@ -30,18 +30,6 @@ export interface GalleryItem {
   title: string;
 }
 
-export interface TourPackage {
-  id: string;
-  destination: string;
-  duration: string;
-  price: number;
-  placesCovered: string[];
-  vehicleIncluded: string;
-  hotelIncluded: boolean;
-  mealsIncluded: boolean;
-  image: string;
-}
-
 export interface Destination {
   id: string;
   name: string;
@@ -49,37 +37,6 @@ export interface Destination {
   distance: number; // in km
   duration: string; // e.g. "3.5 hrs"
   startingFare: number;
-}
-
-export interface Coupon {
-  code: string;
-  discountType: 'percentage' | 'fixed';
-  value: number;
-  minBookingValue: number;
-  description: string;
-}
-
-export interface Booking {
-  id: string;
-  fullName: string;
-  mobileNumber: string;
-  pickupLocation: string;
-  destination: string;
-  pickupDate: string;
-  pickupTime: string;
-  returnDate?: string;
-  tripType: 'One Way' | 'Round Trip' | 'Local Rental' | 'Airport Pickup' | 'Airport Drop' | 'Tour Package';
-  passengers: number;
-  vehicleId: string;
-  vehicleName: string;
-  specialInstructions?: string;
-  status: 'Pending' | 'Approved' | 'Completed' | 'Rejected';
-  bookingDate: string;
-  estimatedFare: number;
-  discountApplied: number;
-  totalFare: number;
-  couponCode?: string;
-  favorite?: boolean;
 }
 
 export const defaultVehicles: Vehicle[] = [
@@ -252,74 +209,7 @@ export const defaultDestinations: Destination[] = [
   },
 ];
 
-export const defaultTourPackages: TourPackage[] = [
-  {
-    id: 'p1',
-    destination: 'Hyderabad to Tirupati Tempo Traveller',
-    duration: '3 Days / 2 Nights',
-    price: 29999,
-    placesCovered: ['Tirumala Temple', 'Padmavathi Temple', 'Sri Kalahasti Temple', 'Kapila Theertham'],
-    vehicleIncluded: 'Force Tempo Traveller',
-    hotelIncluded: true,
-    mealsIncluded: true,
-    image: 'https://images.unsplash.com/photo-1600100397990-14b584043ee7?w=600&auto=format&fit=crop&q=80',
-  },
-  {
-    id: 'p2',
-    destination: 'Hyderabad to Shirdi Tempo Traveller',
-    duration: '3 Days / 2 Nights',
-    price: 34999,
-    placesCovered: ['Sai Baba Samadhi Temple', 'Dwarkamai', 'Chavadi', 'Shani Shingnapur'],
-    vehicleIncluded: 'Force Tempo Traveller',
-    hotelIncluded: true,
-    mealsIncluded: true,
-    image: 'https://images.unsplash.com/photo-1602631985686-2bb0604191c4?w=600&auto=format&fit=crop&q=80',
-  },
-  {
-    id: 'p3',
-    destination: 'Hyderabad to Goa Tempo Traveller',
-    duration: '4 Days / 3 Nights',
-    price: 39999,
-    placesCovered: ['Calangute Beach', 'Baga Beach', 'Basilica of Bom Jesus', 'Fort Aguada'],
-    vehicleIncluded: 'Force Tempo Traveller',
-    hotelIncluded: true,
-    mealsIncluded: false,
-    image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&auto=format&fit=crop&q=80',
-  },
-  {
-    id: 'p4',
-    destination: 'Hyderabad to Srisailam Tempo Traveller',
-    duration: '2 Days / 1 Night',
-    price: 15999,
-    placesCovered: ['Mallikarjuna Jyotirlinga Temple', 'Srisailam Dam', 'Patala Ganga', 'Sakshi Ganapathi Temple'],
-    vehicleIncluded: 'Force Tempo Traveller',
-    hotelIncluded: true,
-    mealsIncluded: true,
-    image: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600&auto=format&fit=crop&q=80',
-  },
-  {
-    id: 'p5',
-    destination: 'Hyderabad to Bangalore Tempo Traveller',
-    duration: '3 Days / 2 Nights',
-    price: 32999,
-    placesCovered: ['Bangalore Palace', 'Lalbagh Botanical Garden', 'Cubbon Park', 'Wonderla'],
-    vehicleIncluded: 'Force Tempo Traveller',
-    hotelIncluded: true,
-    mealsIncluded: true,
-    image: 'https://images.unsplash.com/photo-1596176530529-78163a4f7af2?w=600&auto=format&fit=crop&q=80',
-  },
-  {
-    id: 'p6',
-    destination: 'Hyderabad to Ooty Tempo Traveller',
-    duration: '4 Days / 3 Nights',
-    price: 45999,
-    placesCovered: ['Ooty Lake', 'Doddabetta Peak', 'Botanical Gardens', 'Pykara Waterfalls'],
-    vehicleIncluded: 'Force Tempo Traveller',
-    hotelIncluded: true,
-    mealsIncluded: true,
-    image: 'https://images.unsplash.com/photo-1589136777351-fdc9c9400c7e?w=600&auto=format&fit=crop&q=80',
-  },
-];
+
 
 export const defaultReviews: Review[] = [
   {
@@ -426,94 +316,6 @@ export const defaultGalleryItems: GalleryItem[] = [
   },
 ];
 
-export const defaultCoupons: Coupon[] = [
-  {
-    code: 'WELCOME10',
-    discountType: 'percentage',
-    value: 10,
-    minBookingValue: 1000,
-    description: 'Get 10% off on your first trip with us! (Max discount ₹500)',
-  },
-  {
-    code: 'FESTIVAL500',
-    discountType: 'fixed',
-    value: 500,
-    minBookingValue: 4000,
-    description: 'Flat ₹500 off on long outstation round trips.',
-  },
-  {
-    code: 'TEMPLE200',
-    discountType: 'fixed',
-    value: 200,
-    minBookingValue: 2000,
-    description: 'Special discount for holy temple tours.',
-  },
-];
-
-export const defaultBookings: Booking[] = [
-  {
-    id: 'SNT-78291',
-    fullName: 'Ramesh Naidu',
-    mobileNumber: '8074324003',
-    pickupLocation: 'Kukatpally, Hyderabad',
-    destination: 'Tirupati Temple',
-    pickupDate: '2026-07-15',
-    pickupTime: '06:00',
-    returnDate: '2026-07-17',
-    tripType: 'Round Trip',
-    passengers: 5,
-    vehicleId: 'v4',
-    vehicleName: 'Toyota Innova Crysta',
-    specialInstructions: 'Need a senior-citizen friendly route and regular stops.',
-    status: 'Approved',
-    bookingDate: '2026-07-11T14:22:00Z',
-    estimatedFare: 24450,
-    discountApplied: 500,
-    totalFare: 23950,
-    couponCode: 'FESTIVAL500',
-    favorite: true,
-  },
-  {
-    id: 'SNT-19284',
-    fullName: 'Anjali Sharma',
-    mobileNumber: '8123456789',
-    pickupLocation: 'Gachibowli, Hyderabad',
-    destination: 'RGIA Airport',
-    pickupDate: '2026-07-13',
-    pickupTime: '03:30',
-    tripType: 'Airport Drop',
-    passengers: 2,
-    vehicleId: 'v2',
-    vehicleName: 'Suzuki Dzire / Toyota Etios',
-    status: 'Completed',
-    bookingDate: '2026-07-12T10:05:00Z',
-    estimatedFare: 1500,
-    discountApplied: 150,
-    totalFare: 1350,
-    couponCode: 'WELCOME10',
-    favorite: false,
-  },
-  {
-    id: 'SNT-38290',
-    fullName: 'Venkatesh Prasad',
-    mobileNumber: '9000123456',
-    pickupLocation: 'Secunderabad',
-    destination: 'Srisailam Temple',
-    pickupDate: '2026-07-20',
-    pickupTime: '05:00',
-    tripType: 'One Way',
-    passengers: 10,
-    vehicleId: 'v5',
-    vehicleName: 'Force Tempo Traveller',
-    specialInstructions: 'Wheelchair storage space required.',
-    status: 'Pending',
-    bookingDate: '2026-07-13T16:45:00Z',
-    estimatedFare: 6480,
-    discountApplied: 0,
-    totalFare: 6480,
-    favorite: false,
-  },
-];
 
 export interface Driver {
   id: string;

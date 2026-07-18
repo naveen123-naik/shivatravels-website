@@ -3,12 +3,9 @@ import { sql, checkDbConnection } from '@/lib/db';
 import { 
   defaultVehicles, 
   defaultDestinations, 
-  defaultTourPackages, 
   defaultReviews, 
   defaultGalleryItems, 
-  defaultCoupons, 
   defaultDrivers, 
-  defaultBookings,
   defaultContactMessages
 } from '@/data/defaultMockData';
 
@@ -26,33 +23,14 @@ const mapDestination = (d: any) => ({
   startingFare: Number(d.startingFare)
 });
 
-const mapPackage = (p: any) => ({
-  ...p,
-  price: Number(p.price)
-});
-
 const mapReview = (r: any) => ({
   ...r,
   rating: Number(r.rating)
 });
 
-const mapCoupon = (c: any) => ({
-  ...c,
-  value: Number(c.value),
-  minBookingValue: Number(c.minBookingValue)
-});
-
 const mapDriver = (d: any) => ({
   ...d,
   experience: Number(d.experience)
-});
-
-const mapBooking = (b: any) => ({
-  ...b,
-  passengers: Number(b.passengers),
-  estimatedFare: Number(b.estimatedFare),
-  discountApplied: Number(b.discountApplied),
-  totalFare: Number(b.totalFare)
 });
 
 const mapMessage = (m: any) => ({
@@ -133,21 +111,7 @@ async function ensureSeeded() {
     await markTableSeeded('seeded_destinations');
   }
 
-  // 3. Tour Packages
-  if (!(await isTableSeeded('seeded_packages'))) {
-    const pkgCount = await db`SELECT count(*)::int as count FROM tour_packages`;
-    if (pkgCount[0].count === 0) {
-      console.log('Seeding tour_packages table...');
-      for (const p of defaultTourPackages) {
-        await db`
-          INSERT INTO tour_packages (id, destination, duration, price, "placesCovered", "vehicleIncluded", "hotelIncluded", "mealsIncluded", image)
-          VALUES (${p.id}, ${p.destination}, ${p.duration}, ${p.price}, ${p.placesCovered}, ${p.vehicleIncluded}, ${p.hotelIncluded}, ${p.mealsIncluded}, ${p.image})
-          ON CONFLICT (id) DO NOTHING
-        `;
-      }
-    }
-    await markTableSeeded('seeded_packages');
-  }
+
 
   // 4. Reviews
   if (!(await isTableSeeded('seeded_reviews'))) {
@@ -181,21 +145,7 @@ async function ensureSeeded() {
     await markTableSeeded('seeded_gallery');
   }
 
-  // 6. Coupons
-  if (!(await isTableSeeded('seeded_coupons'))) {
-    const couponsCount = await db`SELECT count(*)::int as count FROM coupons`;
-    if (couponsCount[0].count === 0) {
-      console.log('Seeding coupons table...');
-      for (const c of defaultCoupons) {
-        await db`
-          INSERT INTO coupons (code, "discountType", value, "minBookingValue", description)
-          VALUES (${c.code}, ${c.discountType}, ${c.value}, ${c.minBookingValue}, ${c.description})
-          ON CONFLICT (code) DO NOTHING
-        `;
-      }
-    }
-    await markTableSeeded('seeded_coupons');
-  }
+
 
   // 7. Drivers
   if (!(await isTableSeeded('seeded_drivers'))) {
@@ -213,21 +163,7 @@ async function ensureSeeded() {
     await markTableSeeded('seeded_drivers');
   }
 
-  // 8. Bookings
-  if (!(await isTableSeeded('seeded_bookings'))) {
-    const bookingsCount = await db`SELECT count(*)::int as count FROM bookings`;
-    if (bookingsCount[0].count === 0) {
-      console.log('Seeding bookings table...');
-      for (const b of defaultBookings) {
-        await db`
-          INSERT INTO bookings (id, "fullName", "mobileNumber", "pickupLocation", destination, "pickupDate", "pickupTime", "returnDate", "tripType", passengers, "vehicleId", "vehicleName", "specialInstructions", status, "bookingDate", "estimatedFare", "discountApplied", "totalFare", "couponCode", favorite)
-          VALUES (${b.id}, ${b.fullName}, ${b.mobileNumber}, ${b.pickupLocation}, ${b.destination}, ${b.pickupDate}, ${b.pickupTime}, ${b.returnDate || null}, ${b.tripType}, ${b.passengers}, ${b.vehicleId}, ${b.vehicleName}, ${b.specialInstructions || null}, ${b.status}, ${b.bookingDate}, ${b.estimatedFare}, ${b.discountApplied}, ${b.totalFare}, ${b.couponCode || null}, ${b.favorite ?? false})
-          ON CONFLICT (id) DO NOTHING
-        `;
-      }
-    }
-    await markTableSeeded('seeded_bookings');
-  }
+
 
   // 9. Contact Messages
   if (!(await isTableSeeded('seeded_messages'))) {
@@ -264,22 +200,16 @@ export async function GET() {
     const [
       vehiclesRaw,
       destinationsRaw,
-      packagesRaw,
       reviewsRaw,
       galleryRaw,
-      couponsRaw,
       driversRaw,
-      bookingsRaw,
       messagesRaw
     ] = await Promise.all([
       sql`SELECT * FROM vehicles ORDER BY id ASC`,
       sql`SELECT * FROM destinations ORDER BY id ASC`,
-      sql`SELECT * FROM tour_packages ORDER BY id ASC`,
       sql`SELECT * FROM reviews ORDER BY date DESC, id DESC`,
       sql`SELECT * FROM gallery_items ORDER BY created_at DESC, id DESC`,
-      sql`SELECT * FROM coupons ORDER BY code ASC`,
       sql`SELECT * FROM drivers ORDER BY id ASC`,
-      sql`SELECT * FROM bookings ORDER BY created_at DESC, id DESC`,
       sql`SELECT * FROM contact_messages ORDER BY created_at DESC, id DESC`
     ]);
 
@@ -287,12 +217,9 @@ export async function GET() {
     const data = {
       vehicles: vehiclesRaw.map(mapVehicle),
       destinations: destinationsRaw.map(mapDestination),
-      packages: packagesRaw.map(mapPackage),
       reviews: reviewsRaw.map(mapReview),
       gallery: galleryRaw,
-      coupons: couponsRaw.map(mapCoupon),
       drivers: driversRaw.map(mapDriver),
-      bookings: bookingsRaw.map(mapBooking),
       messages: messagesRaw.map(mapMessage)
     };
 
@@ -326,15 +253,6 @@ export async function POST(request: Request) {
     }
 
     switch (entity) {
-      case 'bookings': {
-        const b = data;
-        const result = await sql`
-          INSERT INTO bookings (id, "fullName", "mobileNumber", "pickupLocation", destination, "pickupDate", "pickupTime", "returnDate", "tripType", passengers, "vehicleId", "vehicleName", "specialInstructions", status, "bookingDate", "estimatedFare", "discountApplied", "totalFare", "couponCode", favorite)
-          VALUES (${b.id}, ${b.fullName}, ${b.mobileNumber}, ${b.pickupLocation}, ${b.destination}, ${b.pickupDate}, ${b.pickupTime}, ${b.returnDate || null}, ${b.tripType}, ${b.passengers}, ${b.vehicleId}, ${b.vehicleName}, ${b.specialInstructions || null}, ${b.status}, ${b.bookingDate}, ${b.estimatedFare}, ${b.discountApplied}, ${b.totalFare}, ${b.couponCode || null}, ${b.favorite ?? false})
-          RETURNING *
-        `;
-        return NextResponse.json({ success: true, data: mapBooking(result[0]) });
-      }
       case 'vehicles': {
         const v = data;
         const result = await sql`
@@ -344,15 +262,6 @@ export async function POST(request: Request) {
         `;
         return NextResponse.json({ success: true, data: mapVehicle(result[0]) });
       }
-      case 'packages': {
-        const p = data;
-        const result = await sql`
-          INSERT INTO tour_packages (id, destination, duration, price, "placesCovered", "vehicleIncluded", "hotelIncluded", "mealsIncluded", image)
-          VALUES (${p.id}, ${p.destination}, ${p.duration}, ${p.price}, ${p.placesCovered}, ${p.vehicleIncluded}, ${p.hotelIncluded}, ${p.mealsIncluded}, ${p.image})
-          RETURNING *
-        `;
-        return NextResponse.json({ success: true, data: mapPackage(result[0]) });
-      }
       case 'reviews': {
         const r = data;
         const result = await sql`
@@ -361,15 +270,6 @@ export async function POST(request: Request) {
           RETURNING *
         `;
         return NextResponse.json({ success: true, data: mapReview(result[0]) });
-      }
-      case 'coupons': {
-        const c = data;
-        const result = await sql`
-          INSERT INTO coupons (code, "discountType", value, "minBookingValue", description)
-          VALUES (${c.code}, ${c.discountType}, ${c.value}, ${c.minBookingValue}, ${c.description})
-          RETURNING *
-        `;
-        return NextResponse.json({ success: true, data: mapCoupon(result[0]) });
       }
       case 'drivers': {
         const dr = data;
@@ -422,39 +322,12 @@ export async function PUT(request: Request) {
     }
 
     switch (entity) {
-      case 'bookings': {
-        const b = data;
-        await sql`
-          UPDATE bookings 
-          SET "fullName" = ${b.fullName}, "mobileNumber" = ${b.mobileNumber}, "pickupLocation" = ${b.pickupLocation}, destination = ${b.destination}, "pickupDate" = ${b.pickupDate}, "pickupTime" = ${b.pickupTime}, "returnDate" = ${b.returnDate || null}, "tripType" = ${b.tripType}, passengers = ${b.passengers}, "vehicleId" = ${b.vehicleId}, "vehicleName" = ${b.vehicleName}, "specialInstructions" = ${b.specialInstructions || null}, status = ${b.status}, "estimatedFare" = ${b.estimatedFare}, "discountApplied" = ${b.discountApplied}, "totalFare" = ${b.totalFare}, "couponCode" = ${b.couponCode || null}, favorite = ${b.favorite ?? false}
-          WHERE id = ${b.id}
-        `;
-        return NextResponse.json({ success: true });
-      }
       case 'vehicles': {
         const v = data;
         await sql`
           UPDATE vehicles 
           SET name = ${v.name}, category = ${v.category}, image = ${v.image}, "seatingCapacity" = ${v.seatingCapacity}, "luggageCapacity" = ${v.luggageCapacity}, ac = ${v.ac}, "fuelType" = ${v.fuelType}, "pricePerKm" = ${v.pricePerKm}, "driverAllowance" = ${v.driverAllowance}, features = ${v.features}, available = ${v.available}
           WHERE id = ${v.id}
-        `;
-        return NextResponse.json({ success: true });
-      }
-      case 'packages': {
-        const p = data;
-        await sql`
-          UPDATE tour_packages 
-          SET destination = ${p.destination}, duration = ${p.duration}, price = ${p.price}, "placesCovered" = ${p.placesCovered}, "vehicleIncluded" = ${p.vehicleIncluded}, "hotelIncluded" = ${p.hotelIncluded}, "mealsIncluded" = ${p.mealsIncluded}, image = ${p.image}
-          WHERE id = ${p.id}
-        `;
-        return NextResponse.json({ success: true });
-      }
-      case 'coupons': {
-        const c = data;
-        await sql`
-          UPDATE coupons 
-          SET "discountType" = ${c.discountType}, value = ${c.value}, "minBookingValue" = ${c.minBookingValue}, description = ${c.description}
-          WHERE code = ${c.code}
         `;
         return NextResponse.json({ success: true });
       }
@@ -504,12 +377,7 @@ export async function DELETE(request: Request) {
       case 'vehicles':
         await sql`DELETE FROM vehicles WHERE id = ${id}`;
         break;
-      case 'packages':
-        await sql`DELETE FROM tour_packages WHERE id = ${id}`;
-        break;
-      case 'coupons':
-        await sql`DELETE FROM coupons WHERE code = ${id}`;
-        break;
+
       case 'drivers':
         await sql`DELETE FROM drivers WHERE id = ${id}`;
         break;

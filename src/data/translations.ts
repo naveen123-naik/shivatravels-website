@@ -6,7 +6,6 @@ export interface Dictionary {
     about: string;
     services: string;
     fleet: string;
-    packages: string;
     pricing: string;
     gallery: string;
     testimonials: string;
@@ -24,34 +23,6 @@ export interface Dictionary {
     badgeClean: string;
     badgePricing: string;
     badgeTrusted: string;
-  };
-  booking: {
-    title: string;
-    subtitle: string;
-    fullName: string;
-    mobile: string;
-    pickupLoc: string;
-    destLoc: string;
-    pickupDate: string;
-    pickupTime: string;
-    returnDate: string;
-    optional: string;
-    tripType: string;
-    passengers: string;
-    selectVehicle: string;
-    specialInst: string;
-    submit: string;
-    confirmTitle: string;
-    confirmDesc: string;
-    refNo: string;
-    close: string;
-    trackTitle: string;
-    trackPlaceholder: string;
-    trackButton: string;
-    trackResult: string;
-    receiptTitle: string;
-    print: string;
-    download: string;
   };
   fleet: {
     title: string;
@@ -101,18 +72,6 @@ export interface Dictionary {
     distance: string;
     duration: string;
     startingFrom: string;
-  };
-  packages: {
-    title: string;
-    subtitle: string;
-    duration: string;
-    places: string;
-    vehicle: string;
-    hotel: string;
-    meals: string;
-    included: string;
-    notIncluded: string;
-    book: string;
   };
   estimator: {
     title: string;
@@ -199,7 +158,6 @@ export const translations: Record<Language, Dictionary> = {
       about: 'About',
       services: 'Services',
       fleet: 'Fleet',
-      packages: 'Packages',
       pricing: 'Pricing',
       gallery: 'Gallery',
       testimonials: 'Reviews',
@@ -217,34 +175,6 @@ export const translations: Record<Language, Dictionary> = {
       badgeClean: 'Safe & Clean Vehicles',
       badgePricing: 'Affordable Pricing',
       badgeTrusted: 'Trusted by Hundreds',
-    },
-    booking: {
-      title: 'Online Booking System',
-      subtitle: 'Secure your premium ride in just a few clicks.',
-      fullName: 'Full Name',
-      mobile: 'Mobile Number',
-      pickupLoc: 'Pickup Location',
-      destLoc: 'Destination',
-      pickupDate: 'Pickup Date',
-      pickupTime: 'Pickup Time',
-      returnDate: 'Return Date',
-      optional: 'optional',
-      tripType: 'Trip Type',
-      passengers: 'Number of Passengers',
-      selectVehicle: 'Select Vehicle',
-      specialInst: 'Special Instructions',
-      submit: 'Confirm Booking',
-      confirmTitle: 'Booking Request Received!',
-      confirmDesc: 'Thank you for choosing Shiva Naik Travels. Your booking is under review and will be confirmed shortly.',
-      refNo: 'Booking Reference Number',
-      close: 'Close',
-      trackTitle: 'Track Booking Status',
-      trackPlaceholder: 'Enter Booking ID (e.g. SNT-78291)',
-      trackButton: 'Track Status',
-      trackResult: 'Booking Status',
-      receiptTitle: 'Booking Receipt',
-      print: 'Print Receipt',
-      download: 'Download PDF',
     },
     fleet: {
       title: 'Our Premium Fleet',
@@ -294,18 +224,6 @@ export const translations: Record<Language, Dictionary> = {
       distance: 'Distance',
       duration: 'Est. Time',
       startingFrom: 'Starting Fare',
-    },
-    packages: {
-      title: 'Attractive Tour Packages',
-      subtitle: 'Handpicked custom tour plans designed for value, convenience, and complete sightseeing.',
-      duration: 'Duration',
-      places: 'Places Covered',
-      vehicle: 'Vehicle Included',
-      hotel: 'Hotel Accommodation',
-      meals: 'Meals Included',
-      included: 'Included',
-      notIncluded: 'Not Included',
-      book: 'Book Package',
     },
     estimator: {
       title: 'Fare Estimator',
@@ -390,7 +308,6 @@ export const translations: Record<Language, Dictionary> = {
       about: 'మా గురించి',
       services: 'సేవలు',
       fleet: 'వాహన శ్రేణి',
-      packages: 'టూర్ ప్యాకేజీలు',
       pricing: 'ధరలు',
       gallery: 'గ్యాలరీ',
       testimonials: 'సమీక్షలు',
@@ -408,34 +325,6 @@ export const translations: Record<Language, Dictionary> = {
       badgeClean: 'సురక్షితమైన & శుభ్రమైన వాహనాలు',
       badgePricing: 'అందుబాటు ధరలు',
       badgeTrusted: 'వందలాది మంది నమ్మకం',
-    },
-    booking: {
-      title: 'ఆన్‌లైన్ బుకింగ్ సిస్టమ్',
-      subtitle: 'కొన్ని క్లిక్‌లలో మీ ప్రీమియం ప్రయాణాన్ని ఖరారు చేసుకోండి.',
-      fullName: 'పూర్తి పేరు',
-      mobile: 'మొబైల్ సంఖ్య',
-      pickupLoc: 'పికప్ లొకేషన్',
-      destLoc: 'గమ్యస్థానం (డెస్టినేషన్)',
-      pickupDate: 'పికప్ తేదీ',
-      pickupTime: 'పికప్ సమయం',
-      returnDate: 'తిరిగి వచ్చే తేదీ',
-      optional: 'ఐచ్ఛికం',
-      tripType: 'ప్రయాణ రకం',
-      passengers: 'ప్రయాణీకుల సంఖ్య',
-      selectVehicle: 'వాహనాన్ని ఎంచుకోండి',
-      specialInst: 'ప్రత్యేక సూచనలు',
-      submit: 'బుకింగ్‌ను నిర్ధారించండి',
-      confirmTitle: 'బుకింగ్ అభ్యర్థన అందింది!',
-      confirmDesc: 'శివ నాయక్ ట్రావెల్స్‌ని ఎంచుకున్నందుకు ధన్యవాదాలు. మీ బుకింగ్ సమీక్షలో ఉంది మరియు త్వరలో నిర్ధారించబడుతుంది.',
-      refNo: 'బుకింగ్ రెఫరెన్స్ నంబర్',
-      close: 'మూసివేయి',
-      trackTitle: 'బుకింగ్ స్థితిని ట్రాక్ చేయండి',
-      trackPlaceholder: 'బుకింగ్ ఐడి నమోదు చేయండి (ఉదా: SNT-78291)',
-      trackButton: 'స్థితిని ట్రాక్ చేయండి',
-      trackResult: 'బుకింగ్ స్థితి',
-      receiptTitle: 'బుకింగ్ రశీదు',
-      print: 'రశీదు ప్రింట్ చేయండి',
-      download: 'పీడీఎఫ్ డౌన్‌లోడ్',
     },
     fleet: {
       title: 'మా వాహన శ్రేణి',
@@ -485,18 +374,6 @@ export const translations: Record<Language, Dictionary> = {
       distance: 'దూరం',
       duration: 'సమయం',
       startingFrom: 'ప్రారంభ ధర',
-    },
-    packages: {
-      title: 'ఆకర్షణీయమైన టూర్ ప్యాకేజీలు',
-      subtitle: 'సౌకర్యం మరియు విలువ కోసం రూపొందించబడిన అనుకూలమైన టూర్ ప్లాన్లు.',
-      duration: 'వ్యవధి',
-      places: 'సందర్శించే స్థలాలు',
-      vehicle: 'చేర్చబడిన వాహనం',
-      hotel: 'హోటల్ వసతి',
-      meals: 'భోజనం సదుపాయం',
-      included: 'చేర్చబడింది',
-      notIncluded: 'చేర్చబడలేదు',
-      book: 'ప్యాకేజీ బుక్ చేయండి',
     },
     estimator: {
       title: 'ధరల అంచనాదారు (ఫేర్ ఎస్టిమేటర్)',
@@ -581,7 +458,6 @@ export const translations: Record<Language, Dictionary> = {
       about: 'हमारे बारे में',
       services: 'सेवाएं',
       fleet: 'वाहनों का बेड़ा',
-      packages: 'टूर पैकेज',
       pricing: 'किराया',
       gallery: 'गैलरी',
       testimonials: 'समीक्षाएं',
@@ -599,34 +475,6 @@ export const translations: Record<Language, Dictionary> = {
       badgeClean: 'सुरक्षित और स्वच्छ वाहन',
       badgePricing: 'किफायती किराया',
       badgeTrusted: 'सैकड़ों ग्राहकों का विश्वास',
-    },
-    booking: {
-      title: 'ऑनलाइन बुकिंग सिस्टम',
-      subtitle: 'बस कुछ ही क्लिक में अपनी प्रीमियम सवारी सुरक्षित करें।',
-      fullName: 'पूरा नाम',
-      mobile: 'मोबाइल नंबर',
-      pickupLoc: 'पिकअप स्थान',
-      destLoc: 'गंतव्य स्थान',
-      pickupDate: 'पिकअप की तारीख',
-      pickupTime: 'पिकअप का समय',
-      returnDate: 'वापसी की तारीख',
-      optional: 'वैकल्पिक',
-      tripType: 'यात्रा का प्रकार',
-      passengers: 'यात्रियों की संख्या',
-      selectVehicle: 'वाहन चुनें',
-      specialInst: 'विशेष निर्देश',
-      submit: 'बुकिंग की पुष्टि करें',
-      confirmTitle: 'बुकिंग अनुरोध प्राप्त हुआ!',
-      confirmDesc: 'शिव नायक ट्रैवल्स चुनने के लिए धन्यवाद। आपकी बुकिंग की समीक्षा की जा रही है और जल्द ही इसकी पुष्टि की जाएगी।',
-      refNo: 'बुकिंग संदर्भ संख्या',
-      close: 'बंद करें',
-      trackTitle: 'बुकिंग स्थिति को ट्रैक करें',
-      trackPlaceholder: 'बुकिंग आईडी दर्ज करें (जैसे SNT-78291)',
-      trackButton: 'स्थिति ट्रैक करें',
-      trackResult: 'बुकिंग की स्थिति',
-      receiptTitle: 'बुकिंग रसीद',
-      print: 'रसीद प्रिंट करें',
-      download: 'पीडीएफ डाउनलोड',
     },
     fleet: {
       title: 'हमारा प्रीमियम बेड़ा',
@@ -676,18 +524,6 @@ export const translations: Record<Language, Dictionary> = {
       distance: 'दूरी',
       duration: 'अनुमानित समय',
       startingFrom: 'प्रारंभिक किराया',
-    },
-    packages: {
-      title: 'आकर्षक टूर पैकेज',
-      subtitle: 'सुविधा, मूल्य और संपूर्ण दर्शनीय स्थलों की यात्रा के लिए तैयार किए गए कस्टम टूर प्लान।',
-      duration: 'अवधि',
-      places: 'कवर किए गए स्थान',
-      vehicle: 'शामिल वाहन',
-      hotel: 'होटल आवास',
-      meals: 'भोजन शामिल',
-      included: 'शामिल है',
-      notIncluded: 'शामिल नहीं',
-      book: 'पैकेज बुक करें',
     },
     estimator: {
       title: 'किराया अंपायर (फेयर एस्टीमेटर)',

@@ -39,23 +39,7 @@ ALTER TABLE destinations ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Allow public read access to destinations" ON destinations FOR SELECT USING (true);
 CREATE POLICY "Allow public write access to destinations" ON destinations FOR ALL USING (true);
 
--- 3. TOUR PACKAGES TABLE
-CREATE TABLE IF NOT EXISTS tour_packages (
-  id TEXT PRIMARY KEY,
-  destination TEXT NOT NULL,
-  duration TEXT NOT NULL,
-  price NUMERIC NOT NULL,
-  "placesCovered" TEXT[] NOT NULL DEFAULT '{}',
-  "vehicleIncluded" TEXT NOT NULL,
-  "hotelIncluded" BOOLEAN NOT NULL,
-  "mealsIncluded" BOOLEAN NOT NULL,
-  image TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
 
-ALTER TABLE tour_packages ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Allow public read access to tour_packages" ON tour_packages FOR SELECT USING (true);
-CREATE POLICY "Allow public write access to tour_packages" ON tour_packages FOR ALL USING (true);
 
 -- 4. REVIEWS TABLE
 CREATE TABLE IF NOT EXISTS reviews (
@@ -86,19 +70,7 @@ ALTER TABLE gallery_items ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Allow public read access to gallery_items" ON gallery_items FOR SELECT USING (true);
 CREATE POLICY "Allow public write access to gallery_items" ON gallery_items FOR ALL USING (true);
 
--- 6. COUPONS TABLE
-CREATE TABLE IF NOT EXISTS coupons (
-  code TEXT PRIMARY KEY,
-  "discountType" TEXT NOT NULL,
-  value NUMERIC NOT NULL,
-  "minBookingValue" NUMERIC NOT NULL,
-  description TEXT NOT NULL,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
 
-ALTER TABLE coupons ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Allow public read access to coupons" ON coupons FOR SELECT USING (true);
-CREATE POLICY "Allow public write access to coupons" ON coupons FOR ALL USING (true);
 
 -- 7. DRIVERS TABLE
 CREATE TABLE IF NOT EXISTS drivers (
@@ -116,34 +88,7 @@ ALTER TABLE drivers ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Allow public read access to drivers" ON drivers FOR SELECT USING (true);
 CREATE POLICY "Allow public write access to drivers" ON drivers FOR ALL USING (true);
 
--- 8. BOOKINGS TABLE
-CREATE TABLE IF NOT EXISTS bookings (
-  id TEXT PRIMARY KEY,
-  "fullName" TEXT NOT NULL,
-  "mobileNumber" TEXT NOT NULL,
-  "pickupLocation" TEXT NOT NULL,
-  destination TEXT NOT NULL,
-  "pickupDate" TEXT NOT NULL,
-  "pickupTime" TEXT NOT NULL,
-  "returnDate" TEXT,
-  "tripType" TEXT NOT NULL,
-  passengers INTEGER NOT NULL,
-  "vehicleId" TEXT NOT NULL,
-  "vehicleName" TEXT NOT NULL,
-  "specialInstructions" TEXT,
-  status TEXT NOT NULL DEFAULT 'Pending',
-  "bookingDate" TEXT NOT NULL,
-  "estimatedFare" NUMERIC NOT NULL,
-  "discountApplied" NUMERIC NOT NULL,
-  "totalFare" NUMERIC NOT NULL,
-  "couponCode" TEXT,
-  favorite BOOLEAN DEFAULT false,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
 
-ALTER TABLE bookings ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Allow public read access to bookings" ON bookings FOR SELECT USING (true);
-CREATE POLICY "Allow public write access to bookings" ON bookings FOR ALL USING (true);
 
 
 -- ============================================================================
@@ -176,16 +121,7 @@ VALUES
 ('d10', 'Chennai', 'https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=600&auto=format&fit=crop&q=80', 630, '11 hrs', 6930)
 ON CONFLICT (id) DO NOTHING;
 
--- Tour Packages Seed
-INSERT INTO tour_packages (id, destination, duration, price, "placesCovered", "vehicleIncluded", "hotelIncluded", "mealsIncluded", image)
-VALUES
-('p1', 'Hyderabad to Tirupati Tempo Traveller', '3 Days / 2 Nights', 29999, ARRAY['Tirumala Temple', 'Padmavathi Temple', 'Sri Kalahasti Temple', 'Kapila Theertham'], 'Force Tempo Traveller', true, true, 'https://images.unsplash.com/photo-1600100397990-14b584043ee7?w=600&auto=format&fit=crop&q=80'),
-('p2', 'Hyderabad to Shirdi Tempo Traveller', '3 Days / 2 Nights', 34999, ARRAY['Sai Baba Samadhi Temple', 'Dwarkamai', 'Chavadi', 'Shani Shingnapur'], 'Force Tempo Traveller', true, true, 'https://images.unsplash.com/photo-1602631985686-2bb0604191c4?w=600&auto=format&fit=crop&q=80'),
-('p3', 'Hyderabad to Goa Tempo Traveller', '4 Days / 3 Nights', 39999, ARRAY['Calangute Beach', 'Baga Beach', 'Basilica of Bom Jesus', 'Fort Aguada'], 'Force Tempo Traveller', true, false, 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&auto=format&fit=crop&q=80'),
-('p4', 'Hyderabad to Srisailam Tempo Traveller', '2 Days / 1 Night', 15999, ARRAY['Mallikarjuna Jyotirlinga Temple', 'Srisailam Dam', 'Patala Ganga', 'Sakshi Ganapathi Temple'], 'Force Tempo Traveller', true, true, 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600&auto=format&fit=crop&q=80'),
-('p5', 'Hyderabad to Bangalore Tempo Traveller', '3 Days / 2 Nights', 32999, ARRAY['Bangalore Palace', 'Lalbagh Botanical Garden', 'Cubbon Park', 'Wonderla'], 'Force Tempo Traveller', true, true, 'https://images.unsplash.com/photo-1596176530529-78163a4f7af2?w=600&auto=format&fit=crop&q=80'),
-('p6', 'Hyderabad to Ooty Tempo Traveller', '4 Days / 3 Nights', 45999, ARRAY['Ooty Lake', 'Doddabetta Peak', 'Botanical Gardens', 'Pykara Waterfalls'], 'Force Tempo Traveller', true, true, 'https://images.unsplash.com/photo-1589136777351-fdc9c9400c7e?w=600&auto=format&fit=crop&q=80')
-ON CONFLICT (id) DO NOTHING;
+
 
 -- Reviews Seed
 INSERT INTO reviews (id, name, photo, rating, review, "tripDetails", date)
@@ -208,13 +144,7 @@ VALUES
 ('g6', 'Places', 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600&auto=format&fit=crop&q=80', 'Srisailam Dam Overlook')
 ON CONFLICT (id) DO NOTHING;
 
--- Coupons Seed
-INSERT INTO coupons (code, "discountType", value, "minBookingValue", description)
-VALUES
-('WELCOME10', 'percentage', 10, 1000, 'Get 10% off on your first trip with us! (Max discount ₹500)'),
-('FESTIVAL500', 'fixed', 500, 4000, 'Flat ₹500 off on long outstation round trips.'),
-('TEMPLE200', 'fixed', 200, 2000, 'Special discount for holy temple tours.')
-ON CONFLICT (code) DO NOTHING;
+
 
 -- Drivers Seed
 INSERT INTO drivers (id, name, mobile, license, experience, status, "assignedVehicle")
@@ -224,10 +154,4 @@ VALUES
 ('d3', 'P. Yadagiri', '8123488112', 'AP11DL11223', 5, 'Leave', NULL)
 ON CONFLICT (id) DO NOTHING;
 
--- Bookings Seed
-INSERT INTO bookings (id, "fullName", "mobileNumber", "pickupLocation", destination, "pickupDate", "pickupTime", "returnDate", "tripType", passengers, "vehicleId", "vehicleName", "specialInstructions", status, "bookingDate", "estimatedFare", "discountApplied", "totalFare", "couponCode", favorite)
-VALUES
-('SNT-78291', 'Ramesh Naidu', '9848022338', 'Kukatpally, Hyderabad', 'Tirupati Temple', '2026-07-15', '06:00', '2026-07-17', 'Round Trip', 5, 'v4', 'Toyota Innova Crysta', 'Need a senior-citizen friendly route and regular stops.', 'Approved', '2026-07-11T14:22:00Z', 24450, 500, 23950, 'FESTIVAL500', true),
-('SNT-19284', 'Anjali Sharma', '8123456789', 'Gachibowli, Hyderabad', 'RGIA Airport', '2026-07-13', '03:30', NULL, 'Airport Drop', 2, 'v2', 'Suzuki Dzire / Toyota Etios', NULL, 'Completed', '2026-07-12T10:05:00Z', 1500, 150, 1350, 'WELCOME10', false),
-('SNT-38290', 'Venkatesh Prasad', '9000123456', 'Secunderabad', 'Srisailam Temple', '2026-07-20', '05:00', NULL, 'One Way', 10, 'v5', 'Force Tempo Traveller', 'Wheelchair storage space required.', 'Pending', '2026-07-13T16:45:00Z', 6480, 0, 6480, NULL, false)
-ON CONFLICT (id) DO NOTHING;
+
