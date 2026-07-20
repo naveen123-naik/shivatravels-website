@@ -28,6 +28,8 @@ export const Navbar: React.FC = () => {
 
   const navItems = [
     { label: t.nav.home, id: 'home' },
+    { label: t.nav.fleet, id: 'fleet' },
+    { label: t.nav.places, id: 'destinations' },
     { label: t.nav.gallery, id: 'gallery' },
     { label: t.nav.testimonials, id: 'testimonials' },
     { label: t.nav.faqs, id: 'faq' },

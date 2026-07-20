@@ -12,6 +12,7 @@ export interface Dictionary {
     faqs: string;
     contact: string;
     admin: string;
+    places: string;
   };
   hero: {
     title: string;
@@ -164,6 +165,7 @@ export const translations: Record<Language, Dictionary> = {
       faqs: 'FAQs',
       contact: 'Contact',
       admin: 'Admin',
+      places: 'Places',
     },
     hero: {
       title: 'Travel Comfortably. Travel Safely. Travel with Shiva Naik Travels.',
@@ -314,6 +316,7 @@ export const translations: Record<Language, Dictionary> = {
       faqs: 'ప్రశ్నలు',
       contact: 'సంప్రదించండి',
       admin: 'అడ్మిన్',
+      places: 'దర్శనీయ ప్రదేశాలు',
     },
     hero: {
       title: 'సుఖవంతమైన ప్రయాణం. సురక్షిత ప్రయాణం. శివ నాయక్ ట్రావెల్స్‌తో ప్రయాణం.',
@@ -464,6 +467,7 @@ export const translations: Record<Language, Dictionary> = {
       faqs: 'अक्सर पूछे जाने वाले प्रश्न',
       contact: 'संपर्क करें',
       admin: 'एडमिन',
+      places: 'पर्यटन स्थल',
     },
     hero: {
       title: 'आराम से यात्रा करें। सुरक्षित यात्रा करें। शिव नायक ट्रैवल्स के साथ यात्रा करें।',

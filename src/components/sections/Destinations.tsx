@@ -11,11 +11,11 @@ export const Destinations: React.FC = () => {
   const { destinations } = useMockDB();
 
   const handleSelectDestination = () => {
-    const element = document.getElementById('contact');
-    if (element) {
-      const offset = 80;
+    const targetElement = document.getElementById('contact');
+    if (targetElement) {
+      const offset = 120;
       const bodyRect = document.body.getBoundingClientRect().top;
-      const elementRect = element.getBoundingClientRect().top;
+      const elementRect = targetElement.getBoundingClientRect().top;
       const elementPosition = elementRect - bodyRect;
       const offsetPosition = elementPosition - offset;
 
@@ -47,26 +47,34 @@ export const Destinations: React.FC = () => {
           </p>
         </div>
 
-        {/* Grid Container */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+        {/* Centered Flex Container */}
+        <div className="flex flex-wrap justify-center gap-6">
           {destinations.map((dest, idx) => (
             <motion.div
               key={dest.id}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-50px' }}
-              transition={{ duration: 0.4, delay: (idx % 5) * 0.05 }}
-              className="group relative h-80 rounded-2xl overflow-hidden shadow-md cursor-pointer hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300"
+              transition={{ duration: 0.4, delay: (idx % 4) * 0.05 }}
+              className="w-full sm:w-[320px] group relative h-80 rounded-2xl overflow-hidden shadow-md cursor-pointer hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300"
               onClick={handleSelectDestination}
             >
-              {/* Image background */}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={dest.image}
-                alt={dest.name}
-                className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                loading="lazy"
-              />
+              {/* Image background or Placeholder */}
+              {dest.image ? (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img
+                  src={dest.image}
+                  alt={dest.name}
+                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  loading="lazy"
+                />
+              ) : (
+                <div className="absolute inset-0 bg-gradient-to-br from-navy-800 to-navy-950 flex items-center justify-center transition-all duration-300 group-hover:from-navy-750 group-hover:to-navy-900">
+                  <div className="text-white/10 group-hover:text-gold-500/10 transition-colors duration-300">
+                    <MapPin size={90} className="stroke-[1]" />
+                  </div>
+                </div>
+              )}
               
               {/* Overlays */}
               <div className="absolute inset-0 bg-gradient-to-t from-navy-950 via-navy-950/40 to-black/10 transition-opacity duration-300 group-hover:opacity-90" />
@@ -84,31 +92,10 @@ export const Destinations: React.FC = () => {
                   {dest.name}
                 </h3>
                 
-                {/* Distance & Time details */}
-                <div className="grid grid-cols-2 gap-2 text-[10px] text-slate-350 font-semibold border-t border-white/10 pt-2.5 mb-3">
-                  <div className="flex items-center gap-1">
-                    <Navigation size={10} className="text-slate-400" />
-                    <span>{dest.distance > 0 ? `${dest.distance} km` : 'Local'}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Clock size={10} className="text-slate-400" />
-                    <span>{dest.duration}</span>
-                  </div>
-                </div>
-
-                {/* Starting fare and quick action button */}
-                <div className="flex items-center justify-between mt-1">
-                  <div>
-                    <span className="block text-[8px] text-slate-400 uppercase tracking-wider font-bold">
-                      {t.destinations.startingFrom}
-                    </span>
-                    <span className="text-sm font-extrabold text-gold-500">
-                      ₹{dest.startingFare}
-                    </span>
-                  </div>
-                  <span className="text-[10px] font-extrabold bg-gold-500 hover:bg-gold-600 text-navy-850 px-3 py-1.5 rounded-lg group-hover:scale-105 transition-transform duration-200">
-                    Enquire Now
-                  </span>
+                {/* Duration details only */}
+                <div className="flex items-center gap-1.5 text-[10px] text-slate-300 font-semibold border-t border-white/10 pt-2.5">
+                  <Clock size={11} className="text-slate-450" />
+                  <span>{dest.duration}</span>
                 </div>
               </div>
             </motion.div>

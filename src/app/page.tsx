@@ -7,6 +7,7 @@ import { CallNowButton } from '@/components/layout/CallNowButton';
 import { Hero } from '@/components/sections/Hero';
 import { WhyChooseUs } from '@/components/sections/WhyChooseUs';
 import { Fleet } from '@/components/sections/Fleet';
+import { Destinations } from '@/components/sections/Destinations';
 import { Reviews } from '@/components/sections/Reviews';
 import { Gallery } from '@/components/sections/Gallery';
 import { FAQ } from '@/components/sections/FAQ';
@@ -35,6 +36,9 @@ export default function Home() {
 
         {/* Fleet Section */}
         <Fleet />
+
+        {/* Popular Destinations / Places Section */}
+        <Destinations />
 
         {/* Customer reviews slider */}
         <Reviews />

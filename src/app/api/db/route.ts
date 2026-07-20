@@ -96,19 +96,18 @@ async function ensureSeeded() {
   }
 
   // 2. Destinations
-  if (!(await isTableSeeded('seeded_destinations'))) {
-    const destCount = await db`SELECT count(*)::int as count FROM destinations`;
-    if (destCount[0].count === 0) {
-      console.log('Seeding destinations table...');
-      for (const d of defaultDestinations) {
-        await db`
-          INSERT INTO destinations (id, name, image, distance, duration, "startingFare")
-          VALUES (${d.id}, ${d.name}, ${d.image}, ${d.distance}, ${d.duration}, ${d.startingFare})
-          ON CONFLICT (id) DO NOTHING
-        `;
-      }
+  if (!(await isTableSeeded('seeded_destinations_v8'))) {
+    console.log('Seeding destinations table (v8)...');
+    // Clear destinations table first to ensure removed destinations are gone and images are cleared
+    await db`DELETE FROM destinations`;
+    for (const d of defaultDestinations) {
+      await db`
+        INSERT INTO destinations (id, name, image, distance, duration, "startingFare")
+        VALUES (${d.id}, ${d.name}, ${d.image}, ${d.distance}, ${d.duration}, ${d.startingFare})
+        ON CONFLICT (id) DO NOTHING
+      `;
     }
-    await markTableSeeded('seeded_destinations');
+    await markTableSeeded('seeded_destinations_v8');
   }
 
 

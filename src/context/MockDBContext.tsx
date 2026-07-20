@@ -108,8 +108,11 @@ export const MockDBProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           localStorage.setItem('snt_vehicles', JSON.stringify(defaultVehicles));
         }
 
-        if (localDestinations) setDestinations(JSON.parse(localDestinations));
-        else {
+        const parsedDests = localDestinations ? JSON.parse(localDestinations) : [];
+        const hasGoa = parsedDests.some((d: any) => d.name === 'Goa');
+        if (localDestinations && parsedDests.length === defaultDestinations.length && !hasGoa) {
+          setDestinations(parsedDests);
+        } else {
           setDestinations(defaultDestinations);
           localStorage.setItem('snt_destinations', JSON.stringify(defaultDestinations));
         }
