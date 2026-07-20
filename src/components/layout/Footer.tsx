@@ -108,8 +108,8 @@ export const Footer: React.FC = () => {
               </li>
               <li className="flex items-center">
                 <Mail size={18} className="text-gold-500 mr-3 shrink-0" />
-                <a href="mailto:bookings@shivanaiktravels.com" className="hover:text-gold-500 transition-colors">
-                  bookings@shivanaiktravels.com
+                <a href="mailto:mshivakumar892@gmail.com" className="hover:text-gold-500 transition-colors">
+                  mshivakumar892@gmail.com
                 </a>
               </li>
               <li className="flex items-start pt-2 border-t border-slate-800">

@@ -104,8 +104,8 @@ export const Contact: React.FC = () => {
                     <span className="block text-[9px] uppercase tracking-wider text-slate-400 font-extrabold mb-1">
                       {t.contact.email}
                     </span>
-                    <a href="mailto:bookings@shivanaiktravels.com" className="text-sm font-semibold text-slate-200 hover:text-gold-500 transition-colors">
-                      bookings@shivanaiktravels.com
+                    <a href="mailto:mshivakumar892@gmail.com" className="text-sm font-semibold text-slate-200 hover:text-gold-500 transition-colors">
+                      mshivakumar892@gmail.com
                     </a>
                   </div>
                 </div>
